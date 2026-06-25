@@ -57,10 +57,17 @@ export function AnimeModal({ anime, isOpen, onClose }: AnimeModalProps) {
                 
                 {anime.status && (
                   <div className="flex items-center gap-1.5 text-xs font-bold text-white/70 uppercase tracking-wider">
-                    {anime.status === "RELEASING" ? (
+                    {anime.status === "RELEASING" && (
                       <span className="flex items-center text-[#3b82f6]"><PlayCircle className="w-3.5 h-3.5 mr-1" /> Airing</span>
-                    ) : (
+                    )}
+                    {anime.status === "FINISHED" && (
                       <span className="flex items-center text-[#10b981]"><Clock className="w-3.5 h-3.5 mr-1" /> Completed</span>
+                    )}
+                    {anime.status === "NOT_YET_RELEASED" && (
+                      <span className="flex items-center text-[#f59e0b]"><Clock className="w-3.5 h-3.5 mr-1" /> Upcoming</span>
+                    )}
+                    {(anime.status === "CANCELLED" || anime.status === "HIATUS") && (
+                      <span className="flex items-center text-zinc-400"><Clock className="w-3.5 h-3.5 mr-1" /> {anime.status}</span>
                     )}
                   </div>
                 )}
