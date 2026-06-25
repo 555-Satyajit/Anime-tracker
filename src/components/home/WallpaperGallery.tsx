@@ -52,8 +52,8 @@ export function WallpaperGallery({ wallpapers = [] }: { wallpapers?: Wallpaper[]
           <TabsContent value={WALLPAPER_TABS[0].name} className="mt-4">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
               {wallpapers.map((wp) => (
-                <Link key={wp.id} href={wp.path} target="_blank" rel="noopener noreferrer" className="aspect-square relative rounded-2xl overflow-hidden group/img bg-[#111] block">
-                  <img src={wp.thumbs.large} alt="Anime Wallpaper" className="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-500" />
+                <Link key={wp.id} href={wp.url} target="_blank" rel="noopener noreferrer" className="aspect-square relative rounded-2xl overflow-hidden group/img bg-[#111] block">
+                  <img src={wp.url} alt={wp.title} className="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-500" />
                   <div className="absolute inset-0 bg-black/20 group-hover/img:bg-transparent transition-colors duration-500" />
                 </Link>
               ))}

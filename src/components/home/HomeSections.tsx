@@ -103,7 +103,7 @@ export function UpcomingSkeleton() {
 // WALLPAPERS
 // ==========================================
 export async function WallpapersSection() {
-  const wallpapers = await getWallpapers(12);
+  const wallpapers = await getWallpapers({}, 12);
   return <WallpaperGallery wallpapers={wallpapers} />;
 }
 

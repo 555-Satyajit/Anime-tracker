@@ -14,6 +14,8 @@ import {
   RankingsSection, RankingsSkeleton
 } from "@/components/home/HomeSections";
 
+export const dynamic = 'force-dynamic';
+
 export default function Home() {
   return (
     <div className="min-h-screen relative flex flex-col font-sans bg-black">
