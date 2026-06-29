@@ -13,6 +13,8 @@ import { ReleaseCalendar } from "@/components/calendar/ReleaseCalendar";
 import { NewsletterBanner } from "@/components/calendar/NewsletterBanner";
 import { NewSeasonsAlert } from "@/components/calendar/NewSeasonsAlert";
 import { CalendarHeaderControls } from "@/components/calendar/CalendarHeaderControls";
+import { CalendarListWrapper } from "@/components/calendar/CalendarListWrapper";
+import { CalendarSkeleton } from "@/components/calendar/CalendarSkeleton";
 
 export default async function CalendarPage(props: { searchParams: Promise<{ [key: string]: string | undefined }> }) {
   const searchParams = await props.searchParams;
@@ -57,23 +59,27 @@ export default async function CalendarPage(props: { searchParams: Promise<{ [key
           </div>
           
           <div className="flex flex-col min-w-0">
-            {(!searchParams.view || searchParams.view === 'month') && (
-              <MainCalendar searchParams={searchParams} />
-            )}
-            
-            <div className="flex flex-col xl:flex-row gap-8 mt-8">
-              <div className="flex-1 min-w-0">
-                {(!searchParams.view || searchParams.view === 'month' || searchParams.view === 'list') && (
-                  <UpcomingSchedule searchParams={searchParams} />
+            <React.Suspense fallback={<CalendarSkeleton />} key={JSON.stringify(searchParams)}>
+              <CalendarListWrapper fallback={<CalendarSkeleton />}>
+                {(!searchParams.view || searchParams.view === 'month') && (
+                  <MainCalendar searchParams={searchParams} />
                 )}
-                {(!searchParams.view || searchParams.view === 'month' || searchParams.view === 'week') && (
-                  <ReleaseCalendar searchParams={searchParams} />
-                )}
-              </div>
-              <div className="w-full xl:w-[350px] shrink-0">
-                <NewSeasonsAlert />
-              </div>
-            </div>
+                
+                <div className="flex flex-col xl:flex-row gap-8 mt-8">
+                  <div className="flex-1 min-w-0">
+                    {(!searchParams.view || searchParams.view === 'month' || searchParams.view === 'list') && (
+                      <UpcomingSchedule searchParams={searchParams} />
+                    )}
+                    {(!searchParams.view || searchParams.view === 'month' || searchParams.view === 'week') && (
+                      <ReleaseCalendar searchParams={searchParams} />
+                    )}
+                  </div>
+                  <div className="w-full xl:w-[350px] shrink-0">
+                    <NewSeasonsAlert />
+                  </div>
+                </div>
+              </CalendarListWrapper>
+            </React.Suspense>
           </div>
         </div>
         

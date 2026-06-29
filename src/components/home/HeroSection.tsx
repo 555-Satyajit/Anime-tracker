@@ -1,8 +1,13 @@
 import React from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Tv, Calendar, Users, Zap, PlayCircle } from "lucide-react";
+import { cookies } from "next/headers";
 
-export function HeroSection() {
+export async function HeroSection() {
+  const cookieStore = await cookies();
+  const hasAuthCookie = cookieStore.getAll().some(cookie => cookie.name.startsWith('sb-'));
+
   return (
     <>
       {/* Background Video with Soft Masking */}
@@ -48,14 +53,20 @@ export function HeroSection() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 mb-2">
-            <Button size="lg" className="bg-[#e71014] hover:bg-[#c60d10] text-white font-semibold px-6 h-11 rounded-xl text-sm group shadow-none border-none">
-              Start Your Journey
-              <ChevronRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button size="lg" variant="outline" className="bg-[#111111] hover:bg-[#1a1a1a] text-white border-[#2a2a2a] font-semibold px-6 h-11 rounded-xl text-sm group shadow-none">
-              Explore Anime
-              <ChevronRight className="w-4 h-4 ml-2 opacity-50 group-hover:translate-x-1 transition-transform" />
-            </Button>
+            <Link href={hasAuthCookie ? "/Tracker" : "/login"}>
+              <Button size="lg" className="bg-[#e71014] hover:bg-[#c60d10] text-white font-semibold px-6 h-11 rounded-xl text-sm group shadow-none border-none w-full sm:w-auto">
+                {hasAuthCookie ? "Go to Tracker" : "Start Your Journey"}
+                <ChevronRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
+            {!hasAuthCookie && (
+              <Link href="/Tracker">
+                <Button size="lg" variant="outline" className="bg-[#111111] hover:bg-[#1a1a1a] text-white border-[#2a2a2a] font-semibold px-6 h-11 rounded-xl text-sm group shadow-none w-full sm:w-auto">
+                  Explore Anime
+                  <ChevronRight className="w-4 h-4 ml-2 opacity-50 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
 

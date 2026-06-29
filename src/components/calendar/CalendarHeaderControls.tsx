@@ -5,10 +5,12 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useCalendarStore } from "./calendar-store";
 
 export function CalendarHeaderControls() {
   const router = useRouter();
   const params = useSearchParams();
+  const { setIsNavigating } = useCalendarStore();
 
   const currentMonth = params.get('month') ? parseInt(params.get('month') as string) : new Date().getMonth();
   const currentYear = params.get('year') ? parseInt(params.get('year') as string) : new Date().getFullYear();
@@ -29,6 +31,7 @@ export function CalendarHeaderControls() {
     
     newParams.set('month', nextMonth.toString());
     newParams.set('year', nextYear.toString());
+    setIsNavigating(true);
     router.push(`?${newParams.toString()}`);
   };
 
@@ -38,12 +41,14 @@ export function CalendarHeaderControls() {
     newParams.set('month', today.getMonth().toString());
     newParams.set('year', today.getFullYear().toString());
     newParams.delete('date'); // also clear selected date if any
+    setIsNavigating(true);
     router.push(`?${newParams.toString()}`);
   };
 
   const changeView = (view: string) => {
     const newParams = new URLSearchParams(params.toString());
     newParams.set('view', view);
+    setIsNavigating(true);
     router.push(`?${newParams.toString()}`);
   };
 

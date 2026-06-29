@@ -7,6 +7,8 @@ import { CurrentSeason, CurrentSeasonSkeleton } from "@/components/tracker/Curre
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { AddAnimeModal } from "@/components/tracker/AddAnimeModal";
+import { TrackerTabs } from "@/components/tracker/TrackerTabs";
+import { TrackerListWrapper } from "@/components/tracker/TrackerListWrapper";
 
 export default async function AnimeTrackerPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | undefined }> }) {
   const params = await searchParams;
@@ -32,27 +34,7 @@ export default async function AnimeTrackerPage({ searchParams }: { searchParams:
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex items-center gap-6 border-b border-border mb-8 overflow-x-auto pb-px">
-          {["My List", "Watching", "Completed", "On Hold", "Dropped", "Plan to Watch"].map((tab, idx) => {
-            const queryParams = new URLSearchParams();
-            if (tab !== "My List") queryParams.set("status", tab);
-            const href = tab === "My List" ? "/Tracker" : `/Tracker?${queryParams.toString()}`;
-            
-            return (
-              <Link
-                key={idx}
-                href={href}
-                className={`pb-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
-                  currentTab === tab
-                    ? "border-[#e71014] text-foreground" 
-                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-                }`}
-              >
-                {tab}
-              </Link>
-            );
-          })}
-        </div>
+        <TrackerTabs defaultTab={currentTab} />
 
         {/* Stats Row */}
         <div className="mb-8">
@@ -66,7 +48,9 @@ export default async function AnimeTrackerPage({ searchParams }: { searchParams:
           {/* Left Column - Main Tracker List */}
           <div className="w-full min-w-0">
             <React.Suspense fallback={<TrackerListSkeleton />} key={JSON.stringify(params)}>
-              <TrackerList searchParams={params} />
+              <TrackerListWrapper fallback={<TrackerListSkeleton />}>
+                <TrackerList searchParams={params} />
+              </TrackerListWrapper>
             </React.Suspense>
           </div>
 

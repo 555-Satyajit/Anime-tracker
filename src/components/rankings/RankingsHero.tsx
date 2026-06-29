@@ -25,14 +25,20 @@ export function RankingsHero({ category = 'top-anime' }: RankingsHeroProps) {
     <div className="flex flex-col mb-8 gap-8">
       {/* Top Banner Section */}
       <div className="relative w-full h-[350px] border-b border-border/50">
-        {/* Background Image */}
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-60 md:opacity-100"
-          style={{ backgroundImage: "url('https://s4.anilist.co/file/anilistcdn/media/anime/banner/101922-YlzXGqRoFehA.jpg')" }}
-        ></div>
+        {/* Background Image Container */}
+        <div className="absolute inset-y-0 right-0 w-full md:w-[70%] overflow-hidden">
+          <div 
+            className="absolute inset-0 bg-cover bg-[position:top_right] bg-no-repeat opacity-40 md:opacity-100"
+            style={{ 
+              backgroundImage: "url('/ranking.png')",
+              maskImage: 'linear-gradient(to right, transparent, black 40%)',
+              WebkitMaskImage: 'linear-gradient(to right, transparent, black 40%)'
+            }}
+          ></div>
+        </div>
         
         {/* Gradient Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 md:via-transparent to-transparent"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
         
         {/* Content */}

@@ -25,15 +25,21 @@ export function WallpaperHero() {
 
   return (
     <div className="relative w-full h-[500px] md:h-[400px] rounded-2xl overflow-hidden mb-8 border border-border/50">
-      {/* Background Image */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('https://s4.anilist.co/file/anilistcdn/media/anime/banner/101922-YlzXGqRoFehA.jpg')" }} // Using Demon Slayer as placeholder
-      ></div>
+      {/* Background Image Container */}
+      <div className="absolute inset-y-0 right-0 w-full md:w-[70%] overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-cover bg-[position:top_right] bg-no-repeat opacity-40 md:opacity-100"
+          style={{ 
+            backgroundImage: "url('/wallpaper.png')",
+            maskImage: 'linear-gradient(to right, transparent, black 40%)',
+            WebkitMaskImage: 'linear-gradient(to right, transparent, black 40%)'
+          }}
+        ></div>
+      </div>
       
       {/* Gradient Overlays */}
-      <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-transparent"></div>
-      <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 md:via-transparent to-transparent"></div>
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
       
       {/* Content */}
       <div className="relative h-full flex flex-col justify-center px-6 md:px-12 w-full md:w-2/3 lg:w-1/2">

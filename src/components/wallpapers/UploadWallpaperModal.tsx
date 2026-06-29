@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, UploadCloud, Image as ImageIcon } from "lucide-react";
 import { uploadWallpaper } from "@/app/actions/wallpapers";
 
@@ -106,22 +107,30 @@ export function UploadWallpaperModal() {
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium">Category</label>
-              <input 
-                type="text" 
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                placeholder="e.g., Anime"
-                className="h-10 bg-white/5 border border-white/10 rounded-md px-3 text-sm focus:outline-none focus:border-[#e71014] text-white"
-              />
+              <Select value={category} onValueChange={setCategory}>
+                <SelectTrigger className="w-full h-10 bg-white/5 border-white/10 text-white focus:ring-[#e71014]">
+                  <SelectValue placeholder="Select Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Anime">Anime</SelectItem>
+                  <SelectItem value="Characters">Characters</SelectItem>
+                  <SelectItem value="Scenery">Scenery</SelectItem>
+                  <SelectItem value="Minimalist">Minimalist</SelectItem>
+                  <SelectItem value="Action">Action</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium">Resolution</label>
+              <label className="text-sm font-medium flex items-center justify-between">
+                <span>Resolution</span>
+                <span className="text-[10px] text-[#e71014] font-normal uppercase tracking-wider">Auto-detected</span>
+              </label>
               <input 
                 type="text" 
                 value={resolution}
-                onChange={(e) => setResolution(e.target.value)}
-                placeholder="e.g., 1920x1080"
-                className="h-10 bg-white/5 border border-white/10 rounded-md px-3 text-sm focus:outline-none focus:border-[#e71014] text-white"
+                readOnly
+                placeholder="Select image to detect..."
+                className="h-10 bg-white/5 border border-white/10 rounded-md px-3 text-sm text-white/50 cursor-not-allowed focus:outline-none"
               />
             </div>
           </div>

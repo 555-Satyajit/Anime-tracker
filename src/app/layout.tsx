@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SplashScreen } from "@/components/layout/SplashScreen";
+import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 
 const geistSans = Geist({
   variable: "--font-sans",
@@ -34,6 +35,7 @@ export default function RootLayout({
         <SplashScreen />
         {children}
         <Toaster position="top-center" />
+        <MobileBottomNav />
       </body>
     </html>
   );

@@ -61,7 +61,8 @@ export function WallpaperGrid({ initialWallpapers }: WallpaperGridProps) {
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-          <UploadWallpaperModal />
+          {/* Upload Button hidden for now */}
+          {/* <UploadWallpaperModal /> */}
 
           <Sheet>
             <SheetTrigger render={<Button variant="outline" size="icon" className="h-9 w-9 lg:hidden bg-card/50 border-border shrink-0" />}>

@@ -6,6 +6,7 @@ import { Search, ChevronDown, List, Grid } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useDebounce } from "@/hooks/use-debounce";
+import { useTrackerStore } from "./tracker-store";
 
 const GENRES = [
   "Action", "Adventure", "Comedy", "Drama", "Fantasy", 
@@ -20,6 +21,7 @@ const STATUSES = [
 export function TrackerToolbar() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { setIsNavigating } = useTrackerStore();
 
   const currentSearch = searchParams.get("search") || "";
   const currentStatus = searchParams.get("status") || "All Status";
@@ -29,6 +31,17 @@ export function TrackerToolbar() {
 
   const [searchTerm, setSearchTerm] = useState(currentSearch);
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  // Optimistic states
+  const [optStatus, setOptStatus] = useState(currentStatus);
+  const [optGenre, setOptGenre] = useState(currentGenre);
+  const [optSort, setOptSort] = useState(currentSort);
+  const [optView, setOptView] = useState(currentView);
+
+  useEffect(() => setOptStatus(currentStatus), [currentStatus]);
+  useEffect(() => setOptGenre(currentGenre), [currentGenre]);
+  useEffect(() => setOptSort(currentSort), [currentSort]);
+  useEffect(() => setOptView(currentView), [currentView]);
 
   // Sync search input with URL when debounced search term changes
   useEffect(() => {
@@ -43,6 +56,12 @@ export function TrackerToolbar() {
   }, [currentSearch]);
 
   const updateParams = (key: string, value: string | null) => {
+    // Apply optimistic updates instantly
+    if (key === "status") setOptStatus(value || "All Status");
+    if (key === "genre") setOptGenre(value || "All Genres");
+    if (key === "sort") setOptSort(value || "recent");
+    if (key === "view") setOptView(value || "list");
+
     const params = new URLSearchParams(searchParams.toString());
     
     if (value && value !== "All Status" && value !== "All Genres" && value !== "All") {
@@ -56,6 +75,7 @@ export function TrackerToolbar() {
       params.delete("page");
     }
 
+    setIsNavigating(true);
     router.push(`?${params.toString()}`);
   };
 
@@ -75,7 +95,7 @@ export function TrackerToolbar() {
       
       {/* Dropdowns */}
       <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-        <Select value={currentStatus} onValueChange={(val) => updateParams("status", val)}>
+        <Select value={optStatus} onValueChange={(val) => updateParams("status", val)}>
           <SelectTrigger className="h-10 bg-card/50 border-border flex-1 sm:flex-none sm:w-36 font-normal text-xs sm:text-sm">
             <SelectValue placeholder="All Status" />
           </SelectTrigger>
@@ -87,7 +107,7 @@ export function TrackerToolbar() {
           </SelectContent>
         </Select>
 
-        <Select value={currentGenre} onValueChange={(val) => updateParams("genre", val)}>
+        <Select value={optGenre} onValueChange={(val) => updateParams("genre", val)}>
           <SelectTrigger className="h-10 bg-card/50 border-border flex-1 sm:flex-none sm:w-36 font-normal text-xs sm:text-sm">
             <SelectValue placeholder="All Genres" />
           </SelectTrigger>
@@ -99,7 +119,7 @@ export function TrackerToolbar() {
           </SelectContent>
         </Select>
 
-        <Select value={currentSort} onValueChange={(val) => updateParams("sort", val)}>
+        <Select value={optSort} onValueChange={(val) => updateParams("sort", val)}>
           <SelectTrigger className="h-10 bg-card/50 border-border w-full sm:w-40 font-normal text-xs sm:text-sm">
             <SelectValue placeholder="Sort by Recent" />
           </SelectTrigger>
@@ -116,7 +136,7 @@ export function TrackerToolbar() {
         <Button 
           variant="ghost" 
           size="icon" 
-          className={`h-8 w-8 ${currentView === "list" ? "bg-muted text-foreground" : "text-muted-foreground"}`}
+          className={`h-8 w-8 ${optView === "list" ? "bg-muted text-foreground" : "text-muted-foreground"}`}
           onClick={() => updateParams("view", "list")}
         >
           <List className="w-4 h-4" />
@@ -124,7 +144,7 @@ export function TrackerToolbar() {
         <Button 
           variant="ghost" 
           size="icon" 
-          className={`h-8 w-8 ${currentView === "grid" ? "bg-muted text-foreground" : "text-muted-foreground"}`}
+          className={`h-8 w-8 ${optView === "grid" ? "bg-muted text-foreground" : "text-muted-foreground"}`}
           onClick={() => updateParams("view", "grid")}
         >
           <Grid className="w-4 h-4" />

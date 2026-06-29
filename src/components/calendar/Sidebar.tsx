@@ -7,10 +7,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useCalendarStore } from "./calendar-store";
 
 export function CalendarSidebar({ searchParams }: { searchParams?: { [key: string]: string | undefined } }) {
   const router = useRouter();
   const params = useSearchParams();
+  const { setIsNavigating } = useCalendarStore();
   
   const currentMonth = params.get('month') ? parseInt(params.get('month') as string) : new Date().getMonth();
   const currentYear = params.get('year') ? parseInt(params.get('year') as string) : new Date().getFullYear();
@@ -30,6 +32,7 @@ export function CalendarSidebar({ searchParams }: { searchParams?: { [key: strin
     } else {
       newParams.delete('date');
     }
+    setIsNavigating(true);
     router.push(`?${newParams.toString()}`);
   };
 
@@ -46,6 +49,7 @@ export function CalendarSidebar({ searchParams }: { searchParams?: { [key: strin
     }
     newParams.set('month', nextMonth.toString());
     newParams.set('year', nextYear.toString());
+    setIsNavigating(true);
     router.push(`?${newParams.toString()}`);
   };
 
@@ -66,6 +70,7 @@ export function CalendarSidebar({ searchParams }: { searchParams?: { [key: strin
     } else {
       newParams.set(key, current.join(','));
     }
+    setIsNavigating(true);
     router.push(`?${newParams.toString()}`);
   };
 
@@ -76,6 +81,7 @@ export function CalendarSidebar({ searchParams }: { searchParams?: { [key: strin
     } else {
       newParams.set(key, value);
     }
+    setIsNavigating(true);
     router.push(`?${newParams.toString()}`);
   };
 
@@ -85,6 +91,7 @@ export function CalendarSidebar({ searchParams }: { searchParams?: { [key: strin
     newParams.delete('status');
     newParams.delete('genres');
     newParams.delete('days');
+    setIsNavigating(true);
     router.push(`?${newParams.toString()}`);
   };
 

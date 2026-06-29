@@ -7,6 +7,8 @@ import { cookies } from "next/headers";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MobileMenu } from "./MobileMenu";
 import { NavLinks } from "./NavLinks";
+import { NotificationBell } from "./NotificationBell";
+import { UserDropdown } from "./UserDropdown";
 
 const NAV_LINKS = [
   { name: "Home", href: "/" },
@@ -15,7 +17,7 @@ const NAV_LINKS = [
   { name: "Wallpapers", href: "/Wallpapers" },
   { name: "News", href: "/News" },
   { name: "Rankings", href: "/Rankings" },
-  { name: "Community", href: "#" },
+  { name: "Community", href: "/Community" },
 ];
 
 export async function Navbar() {
@@ -50,21 +52,11 @@ export async function Navbar() {
             <button className="hover:text-white transition-colors">
               <Search className="w-5 h-5" />
             </button>
-            <button className="hover:text-white transition-colors relative">
-              <Bell className="w-5 h-5" />
-              <span className="absolute -top-1 -right-1 w-2 h-2 bg-[#e71014] rounded-full" />
-            </button>
+            <NotificationBell />
           </div>
           
           {user ? (
-            <Link href="/profile" className="hidden sm:block">
-              <Avatar className="w-10 h-10 border border-white/20 hover:border-white/50 transition-colors cursor-pointer">
-                <AvatarImage src={user.user_metadata?.avatar_url} />
-                <AvatarFallback className="bg-white/10 text-white">
-                  <User className="w-5 h-5" />
-                </AvatarFallback>
-              </Avatar>
-            </Link>
+            <UserDropdown avatarUrl={user.user_metadata?.avatar_url} />
           ) : (
             <Link href="/login" className="hidden sm:block">
               <Button className="bg-[#e71014] hover:bg-[#c60d10] text-white font-bold px-6 rounded-xl border-none shadow-none">
