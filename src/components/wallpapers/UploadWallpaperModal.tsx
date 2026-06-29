@@ -107,7 +107,7 @@ export function UploadWallpaperModal() {
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium">Category</label>
-              <Select value={category} onValueChange={setCategory}>
+              <Select value={category} onValueChange={(val) => setCategory(val || '')}>
                 <SelectTrigger className="w-full h-10 bg-white/5 border-white/10 text-white focus:ring-[#e71014]">
                   <SelectValue placeholder="Select Category" />
                 </SelectTrigger>
