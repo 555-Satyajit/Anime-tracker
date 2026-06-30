@@ -168,6 +168,25 @@ export default function NotificationsPage() {
     if (data) setNotifications(data);
   };
 
+  const triggerBackgroundCron = async () => {
+    toast.info("Triggering Background Job...");
+    try {
+      const res = await fetch('/api/cron/airing', {
+        headers: {
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_CRON_SECRET || 'secret123'}`
+        }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(`Cron Success! Found ${data.airingFound || 0} airing anime and alerted ${data.usersAlerted || 0} users.`);
+      } else {
+        toast.error(`Cron Failed: ${data.error || "Unknown error"}`);
+      }
+    } catch (err) {
+      toast.error("Failed to trigger cron.");
+    }
+  };
+
   const getIconForType = (type: string) => {
     switch (type) {
       case 'sequel_alert': return <Sparkles className="w-5 h-5 text-[#FFD700]" />;
@@ -296,6 +315,13 @@ export default function NotificationsPage() {
           </button>
           <button onClick={() => sendTestNotification('episode_live_now')} className="px-4 py-2 bg-[#e71014]/20 border border-[#e71014]/50 text-white text-xs font-bold rounded-lg hover:bg-[#e71014]/40 transition-colors">
             Trigger Live Episode Alert
+          </button>
+          
+          <div className="w-full h-px bg-white/10 my-2" />
+          
+          <button onClick={triggerBackgroundCron} className="px-4 py-2 bg-[#10b981]/20 border border-[#10b981]/50 text-white text-xs font-bold rounded-lg hover:bg-[#10b981]/40 transition-colors flex items-center gap-2">
+            <Clock className="w-3.5 h-3.5" />
+            Trigger Background Checker (Cron)
           </button>
         </div>
       </div>

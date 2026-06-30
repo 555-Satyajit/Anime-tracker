@@ -89,3 +89,50 @@ export async function sendWebPush(userId: string, payload: { title: string; body
   await Promise.allSettled(sendPromises);
   return { success: true };
 }
+
+// Background Cron Jobs should use this version by passing the Admin Supabase Client
+export async function sendSystemPush(supabaseAdmin: any, userId: string, payload: { title: string; body: string; url?: string; icon?: string }) {
+  // Fetch all subscriptions for the user (bypassing RLS)
+  const { data: subscriptions, error } = await supabaseAdmin
+    .from('push_subscriptions')
+    .select('*')
+    .eq('user_id', userId);
+
+  if (error || !subscriptions || subscriptions.length === 0) {
+    return { success: false, error: "No subscriptions found" };
+  }
+
+  const notificationPayload = JSON.stringify({
+    title: payload.title,
+    body: payload.body,
+    url: payload.url || '/account/notifications',
+    icon: payload.icon || '/favicon.png'
+  });
+
+  const sendPromises = subscriptions.map(async (sub: any) => {
+    const pushSubscription = {
+      endpoint: sub.endpoint,
+      keys: {
+        p256dh: sub.p256dh,
+        auth: sub.auth
+      }
+    };
+
+    try {
+      await webpush.sendNotification(pushSubscription, notificationPayload);
+    } catch (err: any) {
+      if (err.statusCode === 410 || err.statusCode === 404) {
+        // Subscription has expired or is no longer valid, delete it
+        await supabaseAdmin
+          .from('push_subscriptions')
+          .delete()
+          .eq('id', sub.id);
+      } else {
+        console.error("Error sending push:", err);
+      }
+    }
+  });
+
+  await Promise.allSettled(sendPromises);
+  return { success: true };
+}
