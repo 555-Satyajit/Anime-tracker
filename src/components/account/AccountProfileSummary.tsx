@@ -33,6 +33,7 @@ export function AccountProfileSummary({ user, profile, stats }: AccountProfileSu
             src={bannerUrl} 
             alt="Profile Banner" 
             fill 
+            sizes="(max-width: 768px) 100vw, 33vw"
             className="object-cover opacity-60 mix-blend-screen grayscale contrast-150"
             style={{ filter: "sepia(1) hue-rotate(-50deg) saturate(3) brightness(0.6)" }}
           />

@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { Swords, Compass, Wand2, Rocket, Heart, Ghost, Grid3x3 } from "lucide-react";
 
 const GENRE_ICONS: Record<string, any> = {
@@ -24,21 +25,21 @@ export function ExploreGenres({ genres = [] }: { genres?: string[] }) {
         {displayGenres.map((genre, i) => {
           const Icon = GENRE_ICONS[genre] || Grid3x3;
           return (
-          <button key={i} className="flex items-center gap-3 p-3 rounded-xl bg-[#0a0a0a] border border-white/5 hover:border-white/20 hover:bg-[#111] transition-all group text-left">
+          <Link key={i} href={`/Discover?genre=${genre}`} className="flex items-center gap-3 p-3 rounded-xl bg-[#0a0a0a] border border-white/5 hover:border-white/20 hover:bg-[#111] transition-all group text-left">
             <Icon className="w-5 h-5 text-[#e71014] group-hover:scale-110 transition-transform" />
             <div className="flex flex-col">
               <span className="text-sm font-bold text-white leading-none mb-1.5">{genre}</span>
               <span className="text-[10px] text-[#888] leading-none">Explore</span>
             </div>
-          </button>
+          </Link>
         )})}
-        <button className="flex items-center gap-3 p-3 rounded-xl bg-[#0a0a0a] border border-white/5 hover:border-white/20 hover:bg-[#111] transition-all group text-left">
+        <Link href="/Discover" className="flex items-center gap-3 p-3 rounded-xl bg-[#0a0a0a] border border-white/5 hover:border-white/20 hover:bg-[#111] transition-all group text-left">
           <Grid3x3 className="w-5 h-5 text-[#888] group-hover:text-white transition-colors" />
           <div className="flex flex-col">
             <span className="text-sm font-bold text-white leading-none mb-1.5">More Genres</span>
             <span className="text-[10px] text-[#888] leading-none">Explore all</span>
           </div>
-        </button>
+        </Link>
       </div>
     </section>
   );

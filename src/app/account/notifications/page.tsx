@@ -1,15 +1,44 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Bell, Check, Sparkles, MessageSquare, AlertCircle, Clock } from "lucide-react";
+import { Bell, Check, Sparkles, MessageSquare, AlertCircle, Clock, Smartphone } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
+import { savePushSubscription, sendWebPush } from "@/app/actions/push";
+import { toast } from "sonner";
+
+// Utility to convert VAPID public key
+function urlBase64ToUint8Array(base64String: string) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding)
+    .replace(/\-/g, '+')
+    .replace(/_/g, '/');
+
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
+  
+  // Push Notification state
+  const [isPushSupported, setIsPushSupported] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [pushLoading, setPushLoading] = useState(false);
 
   useEffect(() => {
+    // Check if push is supported
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window) {
+      setIsPushSupported(true);
+      checkSubscription();
+    }
+
     const fetchUserAndNotifications = async () => {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
@@ -29,6 +58,65 @@ export default function NotificationsPage() {
 
     fetchUserAndNotifications();
   }, []);
+
+  const checkSubscription = async () => {
+    try {
+      const registration = await navigator.serviceWorker.register('/sw.js');
+      const subscription = await registration.pushManager.getSubscription();
+      setIsSubscribed(!!subscription);
+    } catch (err) {
+      console.error("Error checking subscription", err);
+    }
+  };
+
+  const subscribeToPush = async () => {
+    setPushLoading(true);
+    try {
+      // Explicitly request permission first
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        toast.error("You need to allow notifications in your browser settings.");
+        setPushLoading(false);
+        return;
+      }
+
+      const registration = await navigator.serviceWorker.register('/sw.js');
+      await navigator.serviceWorker.ready;
+
+      const publicVapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+      console.log("VAPID Key found:", !!publicVapidKey);
+      
+      if (!publicVapidKey) {
+        toast.error("VAPID key is missing.");
+        setPushLoading(false);
+        return;
+      }
+
+      console.log("Converting VAPID key to Uint8Array...");
+      const applicationServerKey = urlBase64ToUint8Array(publicVapidKey);
+      console.log("VAPID Key Uint8Array length:", applicationServerKey.length);
+
+      console.log("Calling pushManager.subscribe...");
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: applicationServerKey
+      });
+      console.log("Push subscription successful:", subscription);
+
+      const result = await savePushSubscription(JSON.parse(JSON.stringify(subscription)));
+      if (result.success) {
+        setIsSubscribed(true);
+        toast.success("Successfully enabled push notifications!");
+      } else {
+        toast.error(result.error || "Failed to save subscription");
+      }
+    } catch (err) {
+      console.error("Failed to subscribe:", err);
+      toast.error("You blocked notifications or an error occurred.");
+    } finally {
+      setPushLoading(false);
+    }
+  };
 
   const markAsRead = async (id: string) => {
     const supabase = createClient();
@@ -66,8 +154,16 @@ export default function NotificationsPage() {
       notif.message = "Thanks for joining. Start tracking your favorite anime today.";
     }
 
+    // 1. Insert In-App Notification
     await supabase.from('notifications').insert(notif);
-    // Realtime will catch this in the Navbar, but for this page we just fetch again or let the user refresh
+    
+    // 2. Trigger OS Web Push Notification
+    await sendWebPush(userId, {
+      title: notif.title,
+      body: notif.message,
+      url: notif.link_url
+    });
+    
     const { data } = await supabase.from('notifications').select('*').eq('user_id', userId).order('created_at', { ascending: false });
     if (data) setNotifications(data);
   };
@@ -100,6 +196,32 @@ export default function NotificationsPage() {
           Mark all as read
         </button>
       </div>
+
+      {/* Push Notifications Settings */}
+      {isPushSupported && (
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-6 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-[#e71014]/10 border border-[#e71014]/20 flex items-center justify-center shrink-0">
+              <Smartphone className="w-6 h-6 text-[#e71014]" />
+            </div>
+            <div>
+              <h3 className="font-bold text-white">Push Notifications</h3>
+              <p className="text-sm text-[#888]">Receive alerts on your device even when Senkai is closed.</p>
+            </div>
+          </div>
+          <button
+            onClick={subscribeToPush}
+            disabled={isSubscribed || pushLoading}
+            className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors ${
+              isSubscribed 
+                ? "bg-green-500/20 text-green-500 cursor-default" 
+                : "bg-[#e71014] text-white hover:bg-[#e71014]/90"
+            }`}
+          >
+            {pushLoading ? "Enabling..." : isSubscribed ? "Enabled" : "Enable Push"}
+          </button>
+        </div>
+      )}
 
       <div className="bg-black border border-white/5 rounded-2xl overflow-hidden flex flex-col">
         {notifications.length === 0 ? (
@@ -163,7 +285,7 @@ export default function NotificationsPage() {
           <AlertCircle className="w-5 h-5 text-[#e71014]" />
           <h3 className="text-[#e71014] font-bold">Developer Testing Area</h3>
         </div>
-        <p className="text-[#888] text-sm mb-4">Click these buttons to simulate background jobs sending you notifications in real-time. Watch the Navbar bell light up!</p>
+        <p className="text-[#888] text-sm mb-4">Click these buttons to simulate background jobs sending you notifications. Watch the Navbar bell light up and check for OS Push Notifications if enabled!</p>
         
         <div className="flex flex-wrap gap-3">
           <button onClick={() => sendTestNotification('system_welcome')} className="px-4 py-2 bg-black border border-white/10 text-white text-xs font-bold rounded-lg hover:bg-white/10 transition-colors">

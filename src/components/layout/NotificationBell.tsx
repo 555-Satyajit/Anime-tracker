@@ -12,10 +12,11 @@ export function NotificationBell() {
 
   useEffect(() => {
     const supabase = createClient();
+    let channel: any = null;
 
     const fetchUserAndNotifications = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return null;
+      if (!user) return;
 
       const { data } = await supabase
         .from('notifications')
@@ -29,7 +30,7 @@ export function NotificationBell() {
         setUnreadCount(data.filter(n => !n.is_read).length);
       }
 
-      const channel = supabase
+      channel = supabase
         .channel(`notifications-${user.id}`)
         .on(
           'postgres_changes',
@@ -45,16 +46,23 @@ export function NotificationBell() {
           }
         )
         .subscribe();
-
-      return channel;
     };
 
-    let channelPromise = fetchUserAndNotifications();
+    fetchUserAndNotifications();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        setNotifications([]);
+        setUnreadCount(0);
+        if (channel) {
+          supabase.removeChannel(channel);
+        }
+      }
+    });
 
     return () => {
-      channelPromise.then(channel => {
-        if (channel) supabase.removeChannel(channel);
-      });
+      if (channel) supabase.removeChannel(channel);
+      authListener?.subscription.unsubscribe();
     };
   }, []);
 
@@ -136,12 +144,6 @@ export function NotificationBell() {
               ))}
             </div>
           )}
-        </div>
-        
-        <div className="p-2 bg-white/5 border-t border-white/10 text-center">
-          <Link href="/account/notifications" className="text-xs font-bold text-white hover:text-[#e71014] transition-colors inline-block py-2">
-            View All Notifications
-          </Link>
         </div>
       </PopoverContent>
     </Popover>

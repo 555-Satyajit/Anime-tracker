@@ -1,10 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Star, PlayCircle, Clock } from "lucide-react";
-
+import { Button } from "@/components/ui/button";
+import { Star, PlayCircle, Clock, BookmarkPlus, Loader2 } from "lucide-react";
+import { addAnimeToTracker } from "@/app/actions/tracker";
+import { toast } from "sonner";
 
 interface AnimeModalProps {
   anime: any;
@@ -13,6 +15,8 @@ interface AnimeModalProps {
 }
 
 export function AnimeModal({ anime, isOpen, onClose }: AnimeModalProps) {
+  const [isTracking, setIsTracking] = useState(false);
+
   if (!anime) return null;
 
   const title = anime.title?.english || anime.title?.romaji;
@@ -21,6 +25,22 @@ export function AnimeModal({ anime, isOpen, onClose }: AnimeModalProps) {
   
   // Clean description HTML tags
   const description = anime.description ? anime.description.replace(/<br><br>/g, '<br/>') : "No description available.";
+
+  const handleAddToTracker = async () => {
+    try {
+      setIsTracking(true);
+      const result = await addAnimeToTracker(anime);
+      if (result.success) {
+        toast.success(`Added ${title} to your tracker!`);
+      } else {
+        toast.error(result.message || "Failed to add to tracker");
+      }
+    } catch (error) {
+      toast.error("An unexpected error occurred");
+    } finally {
+      setIsTracking(false);
+    }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -89,6 +109,18 @@ export function AnimeModal({ anime, isOpen, onClose }: AnimeModalProps) {
                   ))}
                 </div>
               )}
+
+              {/* Add to Tracker Button */}
+              <div className="mb-6">
+                <Button 
+                  onClick={handleAddToTracker} 
+                  disabled={isTracking}
+                  className="bg-[#e71014] hover:bg-[#c60d10] text-white font-bold rounded-xl h-9 px-4"
+                >
+                  {isTracking ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <BookmarkPlus className="w-4 h-4 mr-2" />}
+                  Add to Tracker
+                </Button>
+              </div>
 
               {/* Description */}
               <div className="max-h-[160px] overflow-y-auto pr-4 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden text-sm sm:text-[15px] text-[#ccc] leading-relaxed" dangerouslySetInnerHTML={{ __html: description }} />

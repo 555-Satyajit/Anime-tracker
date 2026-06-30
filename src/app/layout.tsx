@@ -17,6 +17,12 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "SENKAI | Your Anime Journey",
   description: "Track your favorite anime, get real-time updates, discover new shows, and immerse in stunning anime wallpapers.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "SENKAI"
+  }
 };
 
 import { Toaster } from "@/components/ui/sonner";

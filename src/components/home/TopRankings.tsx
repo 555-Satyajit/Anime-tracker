@@ -12,7 +12,7 @@ export function TopRankings({ anime = [], movies = [], characters = [] }: { anim
   const [selectedAnime, setSelectedAnime] = useState<any>(null);
 
   const renderList = (list: any[], isCharacter = false) => (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 max-h-[350px] overflow-y-auto pr-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-white/20 transition-colors">
       {list.map((item, i) => {
         const title = isCharacter ? item.name?.full : (item.title?.english || item.title?.romaji);
         const score = isCharacter ? `${(item.favourites / 1000).toFixed(1)}k Faves` : `${item.averageScore}% Score`;
@@ -24,7 +24,7 @@ export function TopRankings({ anime = [], movies = [], characters = [] }: { anim
               {i + 1}
             </div>
             
-            <Avatar className="w-10 h-10 rounded-lg">
+            <Avatar className="w-10 h-10 rounded-lg shrink-0">
               <AvatarImage src={img} alt={title} className="object-cover group-hover:scale-110 transition-transform duration-500" />
               <AvatarFallback className="rounded-lg bg-[#111] text-xs">{title?.[0]}</AvatarFallback>
             </Avatar>
@@ -32,7 +32,7 @@ export function TopRankings({ anime = [], movies = [], characters = [] }: { anim
             <div className="flex-1 min-w-0">
               <h3 className="text-[13px] font-bold text-white line-clamp-1 group-hover:line-clamp-none transition-colors group-hover:text-[#e71014]">{title}</h3>
             </div>
-            <div className="flex items-center gap-1.5 px-2.5 py-1">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 shrink-0">
               <span className="text-[11px] font-bold text-[#888] group-hover:text-white transition-colors">{score}</span>
               {!isCharacter && <Star className="w-3.5 h-3.5 text-[#e71014]" />}
             </div>

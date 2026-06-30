@@ -128,3 +128,31 @@ CREATE POLICY "Users can delete their own notifications"
 -- 10. Enable Realtime for the Notifications table
 -- (Required for the Navbar Bell to update instantly)
 ALTER PUBLICATION supabase_realtime ADD TABLE public.notifications;
+
+-- 11. Create Push Subscriptions Table
+CREATE TABLE public.push_subscriptions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  endpoint TEXT NOT NULL,
+  p256dh TEXT NOT NULL,
+  auth TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+  
+  -- Users can only have one unique endpoint
+  UNIQUE(user_id, endpoint)
+);
+
+-- 12. Enable RLS on Push Subscriptions
+ALTER TABLE public.push_subscriptions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view their own push subscriptions"
+  ON public.push_subscriptions FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own push subscriptions"
+  ON public.push_subscriptions FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own push subscriptions"
+  ON public.push_subscriptions FOR DELETE
+  USING (auth.uid() = user_id);

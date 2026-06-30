@@ -308,3 +308,88 @@ export async function getAnimeByIds(ids: number[]) {
   const data = await fetchAniList(query, { ids });
   return data.Page.media;
 }
+
+export async function getDiscoverAnime(filters: {
+  page?: number;
+  perPage?: number;
+  genre?: string;
+  seasonYear?: number;
+  status?: string;
+  format?: string;
+  sort?: string;
+  search?: string;
+}) {
+  const {
+    page = 1,
+    perPage = 20,
+    genre,
+    seasonYear,
+    status,
+    format,
+    sort = "POPULARITY_DESC",
+    search
+  } = filters;
+
+  const query = `
+    query DiscoverAnime(
+      $page: Int, 
+      $perPage: Int, 
+      $genre: String, 
+      $seasonYear: Int, 
+      $status: MediaStatus, 
+      $format: MediaFormat, 
+      $sort: [MediaSort],
+      $search: String
+    ) {
+      Page(page: $page, perPage: $perPage) {
+        pageInfo {
+          total
+          currentPage
+          lastPage
+          hasNextPage
+          perPage
+        }
+        media(
+          genre: $genre, 
+          seasonYear: $seasonYear, 
+          status: $status, 
+          format: $format, 
+          sort: $sort, 
+          search: $search,
+          type: ANIME, 
+          isAdult: false
+        ) {
+          id
+          title { romaji english }
+          coverImage { extraLarge large }
+          format
+          status
+          episodes
+          averageScore
+          genres
+          description
+        }
+      }
+    }
+  `;
+
+  // Filter out undefined variables so AniList doesn't error out
+  const variables: any = { page, perPage, sort: [sort] };
+  if (genre) variables.genre = genre;
+  if (seasonYear) variables.seasonYear = seasonYear;
+  if (status) variables.status = status;
+  if (format) variables.format = format;
+  if (search) variables.search = search;
+
+  const response = await fetch(ANILIST_API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify({ query, variables }),
+    cache: "no-store", 
+  });
+
+  const json = await response.json();
+  if (json.errors) throw new Error("Failed to search AniList");
+  
+  return json.data.Page;
+}

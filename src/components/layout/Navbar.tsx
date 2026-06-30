@@ -12,6 +12,7 @@ import { UserDropdown } from "./UserDropdown";
 
 const NAV_LINKS = [
   { name: "Home", href: "/" },
+  { name: "Discover", href: "/Discover" },
   { name: "Anime Tracker", href: "/Tracker" },
   { name: "Calendar", href: "/Calendar" },
   { name: "Wallpapers", href: "/Wallpapers" },

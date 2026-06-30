@@ -114,7 +114,12 @@ export function EditAnimeModal({ anime }: { anime: any }) {
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium">Status</label>
-                  <Select value={status} onValueChange={setStatus}>
+                  <Select value={status} onValueChange={(val) => {
+                    setStatus(val);
+                    if (val === "Completed" && anime.total_episodes) {
+                      setEpisodesWatched(anime.total_episodes);
+                    }
+                  }}>
                     <SelectTrigger className="w-full bg-white/5 border-white/10 text-white focus:ring-[#e71014]">
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>

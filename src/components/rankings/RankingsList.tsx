@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AnimeModal } from "@/components/home/AnimeModal";
+import { TrackAnimeButton } from "@/components/rankings/TrackAnimeButton";
 
 interface RankingsListProps {
   animeList?: any[];
@@ -123,9 +124,7 @@ export function RankingsList({ animeList = [], currentPage = 1, category = 'top-
                     </div>
                   </div>
                   
-                  <button className="hidden sm:flex text-muted-foreground hover:text-foreground transition-colors p-2">
-                    <BookmarkPlus className="w-5 h-5" />
-                  </button>
+                  <TrackAnimeButton anime={item} />
                 </div>
               )}
               

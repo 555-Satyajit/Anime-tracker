@@ -1,9 +1,10 @@
 import React from "react";
-import { Star, Film, Users, Building2, Heart } from "lucide-react";
+import { Star, Film, Users, Building2, Heart, TrendingUp } from "lucide-react";
 import Link from "next/link";
 
 const NAV_TABS = [
   { id: 'top-anime', icon: <Star className="w-5 h-5 text-[#e71014]" />, title: "Top Anime", desc: "Highest rated anime" },
+  { id: 'trending', icon: <TrendingUp className="w-5 h-5 text-purple-500" />, title: "Trending Now", desc: "Currently trending" },
   { id: 'top-movies', icon: <Film className="w-5 h-5 text-amber-500" />, title: "Top Movies", desc: "Best anime movies" },
   { id: 'top-characters', icon: <Users className="w-5 h-5 text-orange-500" />, title: "Top Characters", desc: "Most popular characters" },
   { id: 'top-studios', icon: <Building2 className="w-5 h-5 text-blue-500" />, title: "Top Studios", desc: "Leading anime studios" },
@@ -57,7 +58,7 @@ export function RankingsHero({ category = 'top-anime' }: RankingsHeroProps) {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
         {NAV_TABS.map((tab) => {
           const isActive = category === tab.id;
           return (
