@@ -6,6 +6,7 @@ import { Menu, User } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface NavLink {
   name: string;
@@ -49,23 +50,54 @@ export function MobileMenu({ user, navLinks }: { user: any, navLinks: NavLink[] 
 
           <div className="p-6 border-t border-white/10 flex flex-col gap-4 bg-[#0a0a0a]">
             {user ? (
-              <div className="flex items-center gap-4">
-                <Avatar className="w-10 h-10 border border-white/20">
-                  <AvatarImage src={user.user_metadata?.avatar_url} />
-                  <AvatarFallback className="bg-white/10 text-white">
-                    <User className="w-5 h-5" />
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col">
-                  <span className="text-sm font-semibold text-white truncate max-w-[150px]">
-                    {user.user_metadata?.name || user.email || "User"}
-                  </span>
-                  <Link href="/profile" onClick={() => setOpen(false)} className="text-xs text-white/50 hover:text-white transition-colors">
-                    View Profile
-                  </Link>
-                </div>
-              </div>
-            ) : (
+              <Popover>
+                <PopoverTrigger className="text-left outline-none w-full hover:bg-white/5 p-2 rounded-xl transition-colors">
+                  <div className="flex items-center gap-4">
+                    <Avatar className="w-10 h-10 border border-white/20">
+                      <AvatarImage src={user.user_metadata?.avatar_url} />
+                      <AvatarFallback className="bg-white/10 text-white">
+                        <User className="w-5 h-5" />
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-semibold text-white truncate max-w-[150px]">
+                        {user.user_metadata?.name || user.email || "User"}
+                      </span>
+                      <div className="flex items-center gap-1 mt-0.5">
+                        <span className="text-xs text-white/50">Manage Account</span>
+                      </div>
+                    </div>
+                  </div>
+                </PopoverTrigger>
+                <PopoverContent className="w-56 bg-[#0a0a0a] border border-white/10 p-2 rounded-xl mb-2 shadow-2xl" align="end" side="top">
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center justify-between px-3 py-2 rounded-lg text-sm text-[#888]/50 font-medium cursor-not-allowed">
+                      <div className="flex items-center gap-3">
+                        <User className="w-4 h-4" />
+                        Profile
+                      </div>
+                      <span className="text-[9px] uppercase tracking-wider font-bold bg-white/5 px-1.5 py-0.5 rounded text-[#888]/50">Soon</span>
+                    </div>
+                    
+                    <div className="h-px w-full bg-white/10 my-1" />
+                    
+                    <button 
+                      onClick={async () => {
+                        setOpen(false);
+                        const { createClient } = await import("@/utils/supabase/client");
+                        const supabase = createClient();
+                        await supabase.auth.signOut();
+                        window.location.href = '/';
+                      }}
+                      className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-[#e71014] hover:bg-[#e71014]/10 transition-colors font-medium text-left w-full"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                      Log Out
+                    </button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+        ) : (
               <Link href="/login" onClick={() => setOpen(false)}>
                 <Button className="w-full bg-[#e71014] hover:bg-[#c60d10] text-white font-bold rounded-xl border-none shadow-none">
                   Login
