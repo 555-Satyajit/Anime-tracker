@@ -15,11 +15,11 @@ export async function GET(request: Request) {
     const supabaseAdmin = createAdminClient();
 
     // 2. Fetch Airing Schedules from AniList for the past hour and next hour
-    // Since cron jobs might be delayed or run slightly off schedule, we use a generous window
-    // (e.g. from 1 hour ago to 1 hour from now)
+    // Since we are on a Vercel Hobby plan, this cron only runs ONCE a day.
+    // So we need to check for anime airing in a 24 hour window (86400 seconds)
     const now = Math.floor(Date.now() / 1000);
-    const startWindow = now - 3600; // 1 hour ago
-    const endWindow = now + 3600;   // 1 hour from now
+    const startWindow = now - 86400; // 24 hours ago
+    const endWindow = now + 86400;   // 24 hours from now
 
     // Note: AniList `airingSchedules` can be filtered by `airingAt_greater` and `airingAt_lesser`
     const query = `
