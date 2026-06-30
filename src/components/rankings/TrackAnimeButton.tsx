@@ -15,7 +15,7 @@ export function TrackAnimeButton({ anime }: { anime: any }) {
       if (result.success) {
         toast.success(`Added ${anime.title?.english || anime.title?.romaji || 'Anime'} to tracker!`);
       } else {
-        toast.error(result.message || "Failed to add to tracker");
+        toast.error(result.error || "Failed to add to tracker");
       }
     } catch {
       toast.error("An unexpected error occurred");

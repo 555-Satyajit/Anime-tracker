@@ -33,7 +33,7 @@ export function AnimeModal({ anime, isOpen, onClose }: AnimeModalProps) {
       if (result.success) {
         toast.success(`Added ${title} to your tracker!`);
       } else {
-        toast.error(result.message || "Failed to add to tracker");
+        toast.error(result.error || "Failed to add to tracker");
       }
     } catch (error) {
       toast.error("An unexpected error occurred");
