@@ -118,6 +118,25 @@ export default function NotificationsPage() {
     }
   };
 
+  const unsubscribeFromPush = async () => {
+    setPushLoading(true);
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.getSubscription();
+      if (subscription) {
+        await subscription.unsubscribe();
+        // Note: The backend will automatically clean up the dead subscription when it fails to send
+      }
+      setIsSubscribed(false);
+      toast.success("Push notifications disabled.");
+    } catch (err) {
+      console.error("Failed to unsubscribe:", err);
+      toast.error("Failed to disable push.");
+    } finally {
+      setPushLoading(false);
+    }
+  };
+
   const markAsRead = async (id: string) => {
     const supabase = createClient();
     await supabase.from('notifications').update({ is_read: true }).eq('id', id);
@@ -229,15 +248,15 @@ export default function NotificationsPage() {
             </div>
           </div>
           <button
-            onClick={subscribeToPush}
-            disabled={isSubscribed || pushLoading}
+            onClick={isSubscribed ? unsubscribeFromPush : subscribeToPush}
+            disabled={pushLoading}
             className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors ${
               isSubscribed 
-                ? "bg-green-500/20 text-green-500 cursor-default" 
+                ? "bg-white/10 text-white hover:bg-white/20" 
                 : "bg-[#e71014] text-white hover:bg-[#e71014]/90"
             }`}
           >
-            {pushLoading ? "Enabling..." : isSubscribed ? "Enabled" : "Enable Push"}
+            {pushLoading ? "Loading..." : isSubscribed ? "Disable Push" : "Enable Push"}
           </button>
         </div>
       )}
