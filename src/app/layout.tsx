@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SplashScreen } from "@/components/layout/SplashScreen";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
+import { PushNotificationModal } from "@/components/layout/PushNotificationModal";
 
 const geistSans = Geist({
   variable: "--font-sans",
@@ -41,6 +42,7 @@ export default function RootLayout({
         <SplashScreen />
         {children}
         <Toaster position="top-center" />
+        <PushNotificationModal />
         <MobileBottomNav />
       </body>
     </html>
