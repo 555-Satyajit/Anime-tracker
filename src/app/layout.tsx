@@ -16,8 +16,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "SENKAI | Your Anime Journey",
-  description: "Track your favorite anime, get real-time updates, discover new shows, and immerse in stunning anime wallpapers.",
+  title: "SENKAI | Modern Anime Tracker",
+  description: "Track your favorite anime, get real-time airing push notifications, discover new shows, and view the release calendar in a beautiful modern UI.",
+  metadataBase: new URL('https://www.senkaihub.com'),
+  openGraph: {
+    title: "SENKAI | Modern Anime Tracker",
+    description: "Track your favorite anime, get real-time airing push notifications, discover new shows, and view the release calendar.",
+    url: 'https://www.senkaihub.com',
+    siteName: 'SENKAI',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'SENKAI | Modern Anime Tracker',
+    description: 'Track your favorite anime, get real-time airing push notifications, discover new shows, and view the release calendar.',
+  },
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
