@@ -30,8 +30,11 @@ export function NotificationBell() {
         setUnreadCount(data.filter(n => !n.is_read).length);
       }
 
+      // Append a unique random string to the channel name to prevent React StrictMode 
+      // from reusing a lingering channel that was already subscribed to.
+      const uniqueChannelName = `notifications-${user.id}-${Math.random().toString(36).substring(7)}`;
       channel = supabase
-        .channel(`notifications-${user.id}`)
+        .channel(uniqueChannelName)
         .on(
           'postgres_changes',
           {

@@ -139,8 +139,8 @@ export async function TrackerList({ searchParams }: { searchParams?: { [key: str
               <div 
                 key={anime.id} 
                 className={view === "grid"
-                  ? "flex flex-col p-4 border border-white/5 rounded-xl bg-[#0a0a0a]/50 hover:bg-[#111] transition-colors relative"
-                  : "flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 mb-4 border border-white/5 rounded-xl bg-[#0a0a0a]/50 hover:bg-[#111] transition-colors"
+                  ? "flex flex-col p-4 border border-white/5 rounded-xl bg-[#0a0a0a]/50 hover:bg-[#111] transition-colors relative w-full overflow-hidden"
+                  : "flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 mb-4 border border-white/5 rounded-xl bg-[#0a0a0a]/50 hover:bg-[#111] transition-colors w-full overflow-hidden"
                 }
               >
                 {/* Image */}
@@ -149,12 +149,12 @@ export async function TrackerList({ searchParams }: { searchParams?: { [key: str
                 </div>
                 
                 {/* Info Column */}
-                <div className={view === "grid" ? "flex flex-col flex-1 min-w-0" : "flex flex-col flex-1 min-w-0 py-1"}>
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className={`font-bold text-white truncate ${view === "grid" ? "text-base" : "text-lg"}`}>{anime.title}</h3>
+                <div className={view === "grid" ? "flex flex-col flex-1 min-w-0 w-full" : "flex flex-col flex-1 min-w-0 py-1 w-full"}>
+                  <div className="flex items-center gap-2 mb-1 w-full">
+                    <h3 className={`font-bold text-white line-clamp-2 flex-1 min-w-0 ${view === "grid" ? "text-base" : "text-lg"}`} title={anime.title}>{anime.title}</h3>
                     {view !== "grid" && <div className="text-muted-foreground shrink-0"><Monitor className="w-4 h-4" /></div>}
                   </div>
-                  <p className="text-xs text-muted-foreground truncate mb-3">
+                  <p className="text-xs text-muted-foreground truncate mb-3 w-full">
                     TV • {anime.genres || "Unknown"}
                   </p>
                   
