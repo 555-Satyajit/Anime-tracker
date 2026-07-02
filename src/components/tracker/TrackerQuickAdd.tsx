@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Plus, Loader2 } from "lucide-react";
+import { Plus, Loader2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { updateAnimeProgress } from "@/app/actions/tracker";
 
@@ -30,9 +30,13 @@ export function TrackerQuickAdd({ animeId, currentProgress, maxEpisodes }: Track
     }
   };
 
-  // Hide button if completed
+  // Show checkmark if completed
   if (maxEpisodes > 0 && currentProgress >= maxEpisodes) {
-    return null;
+    return (
+      <div className="flex items-center justify-center w-6 h-6 ml-2 rounded-full bg-green-500/20 text-green-500" title="Caught Up!">
+        <Check className="w-3 h-3" />
+      </div>
+    );
   }
 
   return (

@@ -35,6 +35,9 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // We previously redirected authenticated users from '/' to '/Tracker' here,
+  // but it caused friction because they couldn't navigate back to the Home page.
+
   if (
     !user &&
     !request.nextUrl.pathname.startsWith('/login') &&

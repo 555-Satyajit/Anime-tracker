@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, CheckSquare, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TrackerQuickAdd } from "@/components/tracker/TrackerQuickAdd";
 
 interface CalendarDayCellProps {
   day: number;
@@ -12,12 +13,13 @@ interface CalendarDayCellProps {
   isEndOfWeek: boolean;
   isEndOfMonth: boolean;
   episodes: any[];
-  trackedIds: number[];
+  trackedProgress: Record<number, number>;
 }
 
-export function CalendarDayCell({ day, outside, selected, isEndOfWeek, isEndOfMonth, episodes, trackedIds }: CalendarDayCellProps) {
+export function CalendarDayCell({ day, outside, selected, isEndOfWeek, isEndOfMonth, episodes, trackedProgress }: CalendarDayCellProps) {
   const [open, setOpen] = useState(false);
-
+  
+  const trackedIds = Object.keys(trackedProgress).map(Number);
   const trackedEpisodes = episodes.filter((ep: any) => trackedIds.includes(ep.media.id));
 
   // Determine modal title date
@@ -114,18 +116,20 @@ export function CalendarDayCell({ day, outside, selected, isEndOfWeek, isEndOfMo
                          <span className="text-[10px] text-purple-400 font-medium px-2 py-0.5 rounded bg-purple-500/10 border border-purple-500/20 flex items-center gap-1">
                            <CheckSquare className="w-3 h-3" /> Tracked
                          </span>
-                         {isAired ? (
-                           <Button 
-                             variant="outline" 
-                             size="sm" 
-                             className="border-[#e71014] text-[#e71014] hover:bg-[#e71014] hover:text-white transition-colors h-7 text-xs px-2"
-                             onClick={() => window.location.href = "/Tracker"}
-                           >
-                             Update
-                           </Button>
-                         ) : (
-                           <span className="text-[10px] text-muted-foreground px-2 py-1 bg-white/5 rounded">Upcoming</span>
-                         )}
+                          {isAired ? (
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] text-muted-foreground bg-white/5 px-1.5 py-0.5 rounded">
+                                Ep {trackedProgress[ep.media.id] || 0} / {ep.media.episodes || '?'}
+                              </span>
+                              <TrackerQuickAdd 
+                                animeId={ep.media.id} 
+                                currentProgress={trackedProgress[ep.media.id] || 0} 
+                                maxEpisodes={ep.media.episodes || 0} 
+                              />
+                            </div>
+                          ) : (
+                            <span className="text-[10px] text-muted-foreground px-2 py-1 bg-white/5 rounded">Upcoming</span>
+                          )}
                        </div>
                      ) : (
                        <Button 

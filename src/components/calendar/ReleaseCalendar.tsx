@@ -7,16 +7,20 @@ export async function ReleaseCalendar({ searchParams }: { searchParams?: { [key:
   const supabase = await createClient();
   const { data: userData } = await supabase.auth.getUser();
   
-  let trackedIds = new Set<number>();
+  let trackedProgress: Record<number, number> = {};
   if (userData.user) {
-    const { data } = await supabase.from('user_anime_list').select('anime_id').eq('user_id', userData.user.id);
+    const { data } = await supabase.from('user_anime_list').select('anime_id, episodes_watched').eq('user_id', userData.user.id);
     if (data) {
-      data.forEach(item => trackedIds.add(item.anime_id));
+      data.forEach(item => {
+        trackedProgress[item.anime_id] = item.episodes_watched || 0;
+      });
     }
   }
 
+  const trackedIds = Array.from(Object.keys(trackedProgress).map(Number));
+
   // Fetch up to 100 upcoming episodes specifically for tracked anime!
-  const episodes = await getUpcomingEpisodes(100, Array.from(trackedIds));
+  const episodes = await getUpcomingEpisodes(100, trackedIds);
   
   const myListOnly = searchParams?.myList === 'true';
 
@@ -35,7 +39,7 @@ export async function ReleaseCalendar({ searchParams }: { searchParams?: { [key:
     // Find episodes for this day and only keep tracked ones
     const dayEpisodes = filteredEpisodes.filter((ep: any) => {
       const epDate = new Date(ep.airingAt * 1000);
-      return epDate.toDateString() === targetDate.toDateString() && trackedIds.has(ep.media.id);
+      return epDate.toDateString() === targetDate.toDateString() && trackedIds.includes(ep.media.id);
     });
 
     const releases = dayEpisodes;
@@ -67,7 +71,7 @@ export async function ReleaseCalendar({ searchParams }: { searchParams?: { [key:
               key={idx} 
               dayItem={dayItem} 
               rawEpisodes={dayItem.rawEpisodes} 
-              trackedIds={Array.from(trackedIds)} 
+              trackedProgress={trackedProgress} 
             />
           ))}
         </div>

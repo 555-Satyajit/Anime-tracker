@@ -58,7 +58,7 @@ export async function login(prevState: FormState, formData: FormData): Promise<F
   }
 
   revalidatePath('/', 'layout')
-  redirect('/')
+  redirect('/Tracker')
 }
 
 export async function signup(prevState: FormState, formData: FormData): Promise<FormState> {
@@ -102,7 +102,7 @@ export async function signup(prevState: FormState, formData: FormData): Promise<
   }
 
   revalidatePath('/', 'layout')
-  redirect('/')
+  redirect('/Tracker')
 }
 
 export async function loginWithGoogle() {

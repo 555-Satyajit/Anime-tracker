@@ -12,17 +12,21 @@ export async function MainCalendar({ searchParams }: { searchParams?: { [key: st
   const supabase = await createClient();
   const { data: userData } = await supabase.auth.getUser();
   
-  let trackedIds = new Set<number>();
+  let trackedProgress: Record<number, number> = {};
   if (userData.user) {
-    const { data } = await supabase.from('user_anime_list').select('anime_id').eq('user_id', userData.user.id);
+    const { data } = await supabase.from('user_anime_list').select('anime_id, episodes_watched').eq('user_id', userData.user.id);
     if (data) {
-      data.forEach(item => trackedIds.add(item.anime_id));
+      data.forEach(item => {
+        trackedProgress[item.anime_id] = item.episodes_watched || 0;
+      });
     }
   }
 
+  const trackedIds = Array.from(Object.keys(trackedProgress).map(Number));
+
   // Fetch up to 100 upcoming episodes specifically for tracked anime! 
   // (MainCalendar shows a whole month, so we fetch a good amount)
-  const episodes = await getUpcomingEpisodes(100, Array.from(trackedIds));
+  const episodes = await getUpcomingEpisodes(100, trackedIds);
   
   const myListOnly = searchParams?.myList === 'true';
 
@@ -68,7 +72,7 @@ export async function MainCalendar({ searchParams }: { searchParams?: { [key: st
     return {
       ...slot,
       episodes: dayEpisodes,
-      trackedIds: Array.from(trackedIds)
+      trackedProgress
     };
   });
 
@@ -97,7 +101,7 @@ export async function MainCalendar({ searchParams }: { searchParams?: { [key: st
               isEndOfWeek={(idx + 1) % 7 === 0}
               isEndOfMonth={idx >= totalSlots - 7}
               episodes={item.episodes}
-              trackedIds={item.trackedIds}
+              trackedProgress={item.trackedProgress}
             />
           ))}
           </div>

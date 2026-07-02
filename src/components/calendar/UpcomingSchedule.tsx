@@ -12,21 +12,25 @@ export async function UpcomingSchedule({ searchParams }: { searchParams?: { [key
   const supabase = await createClient();
   const { data: userData } = await supabase.auth.getUser();
   
-  let trackedIds = new Set<number>();
+  let trackedProgress: Record<number, number> = {};
   if (userData.user) {
-    const { data } = await supabase.from('user_anime_list').select('anime_id').eq('user_id', userData.user.id);
+    const { data } = await supabase.from('user_anime_list').select('anime_id, episodes_watched').eq('user_id', userData.user.id);
     if (data) {
-      data.forEach(item => trackedIds.add(item.anime_id));
+      data.forEach(item => {
+        trackedProgress[item.anime_id] = item.episodes_watched || 0;
+      });
     }
   }
 
+  const trackedIds = Array.from(Object.keys(trackedProgress).map(Number));
+
   // Fetch 50 upcoming episodes specifically for the tracked anime!
-  const episodes = await getUpcomingEpisodes(50, Array.from(trackedIds));
+  const episodes = await getUpcomingEpisodes(50, trackedIds);
   
   const { filterEpisodes } = await import("./filterUtils");
   const filteredEpisodes = filterEpisodes(episodes, searchParams);
   
-  const displayEpisodes = filteredEpisodes.filter((ep: any) => trackedIds.has(ep.media.id));
+  const displayEpisodes = filteredEpisodes.filter((ep: any) => trackedIds.includes(ep.media.id));
 
   // Pagination Logic
   const ITEMS_PER_PAGE = 10;
@@ -68,7 +72,7 @@ export async function UpcomingSchedule({ searchParams }: { searchParams?: { [key
           const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
           const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-          const isTracked = trackedIds.has(ep.media.id);
+          const isTracked = trackedIds.includes(ep.media.id);
 
           return (
             <div 
