@@ -10,7 +10,6 @@ const NAV_ITEMS = [
   { name: "Tracker", href: "/Tracker", icon: Compass },
   { name: "News", href: "/News", icon: Newspaper },
   { name: "Community", href: "/Community", icon: MessageSquare },
-  { name: "Wallpapers", href: "/Wallpapers", icon: Image },
 ];
 
 export function MobileBottomNav() {

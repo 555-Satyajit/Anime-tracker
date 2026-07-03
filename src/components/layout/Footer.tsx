@@ -52,7 +52,6 @@ export function Footer() {
             <h4 className="text-[11px] font-bold text-white uppercase tracking-widest mb-1">Explore</h4>
             <Link href="#" className="text-xs text-[#888] hover:text-white transition-colors">Anime Tracker</Link>
             <Link href="#" className="text-xs text-[#888] hover:text-white transition-colors">Calendar</Link>
-            <Link href="#" className="text-xs text-[#888] hover:text-white transition-colors">Wallpapers</Link>
             <Link href="#" className="text-xs text-[#888] hover:text-white transition-colors">News</Link>
             <Link href="#" className="text-xs text-[#888] hover:text-white transition-colors">Rankings</Link>
           </div>

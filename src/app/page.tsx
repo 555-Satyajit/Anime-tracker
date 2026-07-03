@@ -56,9 +56,6 @@ export default function Home() {
 
       {/* Community & Discovery Sections */}
       <div className="relative z-10 w-full max-w-[1600px] px-8 lg:px-16 mx-auto flex flex-col gap-6 pb-20">
-        <Suspense fallback={<WallpapersSkeleton />}>
-          <WallpapersSection />
-        </Suspense>
 
         {/* 3-COLUMN GRID */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

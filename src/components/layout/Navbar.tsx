@@ -15,7 +15,6 @@ const NAV_LINKS = [
   { name: "Discover", href: "/Discover" },
   { name: "Anime Tracker", href: "/Tracker" },
   { name: "Calendar", href: "/Calendar" },
-  { name: "Wallpapers", href: "/Wallpapers" },
   { name: "News", href: "/News" },
   { name: "Rankings", href: "/Rankings" },
   { name: "Community", href: "/Community" },
