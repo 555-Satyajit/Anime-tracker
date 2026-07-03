@@ -4,6 +4,7 @@ import "./globals.css";
 import { SplashScreen } from "@/components/layout/SplashScreen";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { PushNotificationModal } from "@/components/layout/PushNotificationModal";
+import { Analytics } from "@vercel/analytics/react";
 
 const geistSans = Geist({
   variable: "--font-sans",
@@ -58,6 +59,7 @@ export default function RootLayout({
         <Toaster position="top-center" />
         <PushNotificationModal />
         <MobileBottomNav />
+        <Analytics />
       </body>
     </html>
   );
