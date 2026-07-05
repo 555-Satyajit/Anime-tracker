@@ -68,7 +68,7 @@ export default async function CalendarPage(props: { searchParams: Promise<{ [key
           </div>
 
           {/* Mobile Sidebar Button */}
-          <div className="lg:hidden w-full">
+          <div className="lg:hidden w-full" id="tour-cal-sidebar-mobile">
             <Sheet>
               <SheetTrigger className="w-full h-12 flex items-center justify-between px-4 border-white/20 bg-card border rounded-md hover:bg-secondary">
                 <span className="font-semibold text-sm">Filters & Calendar</span>
@@ -86,9 +86,7 @@ export default async function CalendarPage(props: { searchParams: Promise<{ [key
             <React.Suspense fallback={<CalendarSkeleton />} key={JSON.stringify(searchParams)}>
               <CalendarListWrapper fallback={<CalendarSkeleton />}>
                 {(!searchParams.view || searchParams.view === 'month') && (
-                  <div id="tour-cal-grid">
-                    <MainCalendar searchParams={searchParams} />
-                  </div>
+                  <MainCalendar searchParams={searchParams} />
                 )}
                 
                 <div className="flex flex-col xl:flex-row gap-8 mt-8">

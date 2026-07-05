@@ -10,13 +10,14 @@ export function InteractiveTour({ forceTutorial }: { forceTutorial?: boolean }) 
   const router = useRouter();
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && localStorage.getItem("tutorial_completed") === "true") {
+    const isTutorialRequested = searchParams.get("tutorial") === "true";
+    if (typeof window !== 'undefined' && localStorage.getItem("tutorial_completed") === "true" && !isTutorialRequested) {
       return;
     }
 
-    if (searchParams.get("tutorial") === "true" || forceTutorial) {
+    if (isTutorialRequested || forceTutorial) {
       // Remove param immediately using history.replaceState to avoid Next.js router cache issues
-      if (searchParams.get("tutorial") === "true") {
+      if (isTutorialRequested) {
         const newParams = new URLSearchParams(searchParams.toString());
         newParams.delete("tutorial");
         const queryStr = newParams.toString() ? `?${newParams.toString()}` : "";
@@ -61,28 +62,36 @@ export function InteractiveTour({ forceTutorial }: { forceTutorial?: boolean }) 
               element: '#tour-anime-card', 
               popover: { 
                 title: 'Tracker Cards', 
-                description: 'This is where the magic happens. Your anime cards show your current progress, genres, and a countdown to the next airing episode.' 
+                description: 'This is where the magic happens. Your anime cards show your current progress, genres, and a countdown to the next airing episode.',
+                side: 'bottom',
+                align: 'center'
               } 
             },
             { 
               element: '#tour-quick-add', 
               popover: { 
                 title: 'Quick Add (+1)', 
-                description: 'Just watched an episode? Click here to instantly bump your progress by 1 without leaving the page!' 
+                description: 'Just watched an episode? Click here to instantly bump your progress by 1 without leaving the page!',
+                side: 'bottom',
+                align: 'center'
               } 
             },
             { 
               element: '#tour-view-details', 
               popover: { 
                 title: 'Full Control', 
-                description: 'Need to make changes? Click View Details to change an anime\'s status, give it a score, or manually type out exact episode counts.' 
+                description: 'Need to make changes? Click View Details to change an anime\'s status, give it a score, or manually type out exact episode counts.',
+                side: 'bottom',
+                align: 'center'
               } 
             },
             { 
-              element: '#tour-nav-calendar', 
+              element: window.innerWidth < 1024 ? '#tour-nav-calendar-mobile' : '#tour-nav-calendar-desktop', 
               popover: { 
                 title: 'Your Release Calendar', 
                 description: 'Finally, check out your personalized calendar to see exactly when your currently airing anime drop this week! Click the button below to continue.',
+                side: window.innerWidth < 1024 ? 'top' : 'bottom',
+                align: 'center'
               },
               onHighlighted: () => {
                 isLastStep = true;

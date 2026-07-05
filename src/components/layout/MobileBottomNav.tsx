@@ -8,7 +8,7 @@ import { Home, Compass, Newspaper, MessageSquare, Calendar as CalendarIcon } fro
 const NAV_ITEMS = [
   { name: "Home", href: "/", icon: Home },
   { name: "Tracker", href: "/Tracker", icon: Compass },
-  { name: "Calendar", href: "/Calendar", icon: CalendarIcon, id: "tour-nav-calendar" },
+  { name: "Calendar", href: "/Calendar", icon: CalendarIcon, id: "tour-nav-calendar-mobile" },
   { name: "News", href: "/News", icon: Newspaper },
   { name: "Community", href: "/Community", icon: MessageSquare },
 ];
@@ -29,17 +29,17 @@ export function MobileBottomNav() {
           const Icon = item.icon;
 
           return (
-            <Link
-              key={item.name}
-              href={item.href}
-              id={item.id}
-              className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-colors ${
-                isActive ? "text-[#e71014]" : "text-[#888] hover:text-white"
-              }`}
-            >
-              <Icon className="w-5 h-5" />
-              <span className="text-[10px] font-medium">{item.name}</span>
-            </Link>
+            <div id={item.id} key={item.name} className="flex-1">
+              <Link
+                href={item.href}
+                className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-colors py-1 ${
+                  isActive ? "text-[#e71014]" : "text-[#888] hover:text-white"
+                }`}
+              >
+                <Icon className="w-5 h-5" />
+                <span className="text-[10px] font-medium">{item.name}</span>
+              </Link>
+            </div>
           );
         })}
       </nav>

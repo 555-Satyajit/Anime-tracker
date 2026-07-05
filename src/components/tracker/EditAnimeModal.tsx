@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Edit2, Trash2, AlertCircle } from "lucide-react";
 import { updateTrackerEntry, removeAnimeFromTracker } from "@/app/actions/tracker";
 
-export function EditAnimeModal({ anime }: { anime: any }) {
+export function EditAnimeModal({ anime, iconOnly }: { anime: any, iconOnly?: boolean }) {
   const [open, setOpen] = useState(false);
   const [status, setStatus] = useState(anime.status || "Watching");
   const [episodesWatched, setEpisodesWatched] = useState(anime.episodes_watched || 0);
@@ -66,8 +66,15 @@ export function EditAnimeModal({ anime }: { anime: any }) {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger render={
-        <Button variant="outline" size="sm" className="w-fit bg-transparent border-white/10 text-white hover:bg-white/5 transition-colors">
-          View Details
+        <Button variant="outline" size="sm" className="w-fit bg-transparent border-white/10 text-white hover:bg-white/5 transition-colors px-2 sm:px-3">
+          {iconOnly ? (
+            <Edit2 className="w-4 h-4" />
+          ) : (
+            <>
+              <span className="hidden sm:inline">View Details</span>
+              <Edit2 className="w-4 h-4 sm:hidden" />
+            </>
+          )}
         </Button>
       } />
       

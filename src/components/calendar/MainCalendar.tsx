@@ -82,7 +82,7 @@ export async function MainCalendar({ searchParams }: { searchParams?: { [key: st
       <div className="rounded-xl border border-border overflow-x-auto bg-card/50 backdrop-blur-sm -mx-4 px-4 sm:mx-0 sm:px-0 hide-scrollbar">
         <div className="min-w-[600px] sm:min-w-0">
           {/* Days Header */}
-          <div className="grid grid-cols-7 border-b border-border">
+          <div id="tour-cal-grid" className="grid grid-cols-7 border-b border-border">
           {DAYS_OF_WEEK.map((day) => (
             <div key={day} className="py-2 sm:py-4 text-center text-[10px] sm:text-xs font-semibold text-muted-foreground">
               {day}

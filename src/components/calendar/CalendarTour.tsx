@@ -32,7 +32,7 @@ export function CalendarTour() {
           doneBtnText: "Start Exploring",
           steps: [
             { 
-              element: '#tour-cal-sidebar', 
+              element: window.innerWidth < 1024 ? '#tour-cal-sidebar-mobile' : '#tour-cal-sidebar', 
               popover: { 
                 title: 'Filters & Settings', 
                 description: 'Filter releases by Season, Year, or just view your own tracked anime. You can customize exactly what you want to see here.' 

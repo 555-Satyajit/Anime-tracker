@@ -282,7 +282,7 @@ export async function TrackerList({
     const CardContent = (
       <div 
         className={cn(
-          "relative overflow-hidden border border-white/5 bg-[#0a0a0a]/50 hover:bg-[#111] transition-colors w-full",
+          "relative overflow-hidden border border-white/5 bg-[#0a0a0a]/50 hover:bg-[#111] transition-colors w-full group",
           view === "grid" ? "flex flex-col p-4 rounded-xl" : "flex flex-row items-start sm:items-center gap-4 p-4 mb-4 rounded-xl"
         )}
       >
@@ -301,12 +301,11 @@ export async function TrackerList({
         {/* Right Side Content Wrapper */}
         <div className={view === "grid" ? "flex flex-col w-full flex-1" : "flex flex-col sm:flex-row w-full flex-1 gap-0 sm:gap-4 min-w-0"}>
           {/* Info Column */}
-          <div className={view === "grid" ? "flex flex-col flex-1 min-w-0 w-full" : "flex flex-col flex-1 min-w-0 py-1 w-full"}>
-          <div className="flex items-center gap-2 mb-1 w-full">
+          <div id={idx === 0 ? "tour-anime-card" : undefined} className={view === "grid" ? "flex flex-col flex-1 min-w-0 w-full" : "flex flex-col flex-1 min-w-0 py-1 w-full"}>
+          <div className="flex items-center gap-2 mb-1 w-full pr-10 sm:pr-0">
             <h3 className={`font-bold text-white line-clamp-2 flex-1 min-w-0 ${view === "grid" ? "text-base" : "text-lg"}`} title={entity.title}>
               {entity.title}
             </h3>
-            {view !== "grid" && !isFolder && <div className="text-muted-foreground shrink-0"><Monitor className="w-4 h-4" /></div>}
           </div>
           <p className="text-xs text-muted-foreground truncate mb-3 w-full">
             {isFolder ? "Franchise Collection" : `TV • ${entity.genres || "Unknown"}`}
@@ -319,16 +318,19 @@ export async function TrackerList({
             </div>
           )}
           
-          <div className={view === "grid" ? "mt-auto pt-2 flex items-center justify-between" : ""}>
+          <div className={view === "grid" ? "mt-auto pt-2 flex items-center justify-between w-full" : ""}>
             {view === "grid" && (
               <div className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${statusDotClass}`}></div>
                 <span className={`text-xs font-medium ${statusTextClass}`}>{entity.status}</span>
               </div>
             )}
-            {!isFolder && (
-              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10 flex gap-2">
-                {!isReadOnly && <EditAnimeModal anime={entity} />}
+            {view === "grid" && !isFolder && (
+              <div 
+                id={idx === 0 ? "tour-view-details" : undefined}
+                className="z-10 flex gap-2"
+              >
+                {!isReadOnly && <EditAnimeModal anime={entity} iconOnly={true} />}
               </div>
             )}
           </div>
@@ -360,7 +362,7 @@ export async function TrackerList({
                 <>
                   {watched} <span className="text-sm text-muted-foreground font-medium">/ {total || '?'}</span>
                   {!isFolder && (
-                    <div>
+                    <div id={idx === 0 ? "tour-quick-add" : undefined}>
                       {!isReadOnly ? (
                         <TrackerQuickAdd animeId={entity.anime_id} currentProgress={watched} maxEpisodes={total || 0} />
                       ) : (
@@ -398,11 +400,12 @@ export async function TrackerList({
             )}
           </div>
           
-            {!isFolder && (
-              <div className="flex items-center justify-center shrink-0 sm:self-center self-end mt-[-30px] sm:mt-0 hidden sm:flex">
-                <Button variant="outline" size="icon" className="w-10 h-10 bg-transparent border-white/10 text-muted-foreground hover:text-white hover:bg-white/5">
-                  <BookmarkPlus className="w-4 h-4" />
-                </Button>
+            {view !== "grid" && !isFolder && (
+              <div 
+                id={idx === 0 ? "tour-view-details" : undefined}
+                className="flex items-center justify-center shrink-0 sm:self-center self-end mt-[-30px] sm:mt-0"
+              >
+                {!isReadOnly && <EditAnimeModal anime={entity} />}
               </div>
             )}
           </div>
