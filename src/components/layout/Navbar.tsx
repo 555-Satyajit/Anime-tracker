@@ -28,6 +28,7 @@ export async function Navbar() {
   let user = null;
   let profileAvatar = null;
   let fallbackName = null;
+  let username = null;
   
   if (hasAuthCookie) {
     const supabase = await createClient();
@@ -37,6 +38,7 @@ export async function Navbar() {
     if (user) {
       const { data: profile } = await supabase.from('user_profiles').select('avatar_url, username').eq('user_id', user.id).single();
       profileAvatar = profile?.avatar_url || user.user_metadata?.avatar_url;
+      username = profile?.username;
       fallbackName = profile?.username || user.user_metadata?.name || user.email || "User";
     }
   }
@@ -74,7 +76,7 @@ export async function Navbar() {
             </Link>
           )}
 
-          <MobileMenu user={user} profileAvatar={profileAvatar} fallbackName={fallbackName} navLinks={NAV_LINKS} />
+          <MobileMenu user={user} profileAvatar={profileAvatar} fallbackName={fallbackName} username={username} navLinks={NAV_LINKS} />
         </div>
       </div>
     </header>

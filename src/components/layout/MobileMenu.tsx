@@ -13,7 +13,7 @@ interface NavLink {
   href: string;
 }
 
-export function MobileMenu({ user, profileAvatar, fallbackName, navLinks }: { user: any, profileAvatar?: string | null, fallbackName?: string | null, navLinks: NavLink[] }) {
+export function MobileMenu({ user, profileAvatar, fallbackName, username, navLinks }: { user: any, profileAvatar?: string | null, fallbackName?: string | null, username?: string | null, navLinks: NavLink[] }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -64,7 +64,7 @@ export function MobileMenu({ user, profileAvatar, fallbackName, navLinks }: { us
                         {user.user_metadata?.name || user.email || "User"}
                       </span>
                       <div className="flex items-center gap-1 mt-0.5">
-                        <span className="text-xs text-white/50">Manage Account</span>
+                        <span className="text-xs text-white/50">{username ? `@${username}` : "Manage Account"}</span>
                       </div>
                     </div>
                   </div>
