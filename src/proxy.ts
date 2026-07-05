@@ -1,7 +1,18 @@
-import { type NextRequest } from 'next/server'
+import { NextResponse, type NextRequest } from 'next/server'
 import { updateSession } from '@/utils/supabase/middleware'
 
 export async function proxy(request: NextRequest) {
+  const isMaintenanceMode = process.env.NEXT_PUBLIC_MAINTENANCE_MODE === 'true';
+  const path = request.nextUrl.pathname;
+
+  if (isMaintenanceMode && path !== '/maintenance') {
+    return NextResponse.redirect(new URL('/maintenance', request.url));
+  }
+
+  if (!isMaintenanceMode && path === '/maintenance') {
+    return NextResponse.redirect(new URL('/', request.url));
+  }
+
   return await updateSession(request)
 }
 

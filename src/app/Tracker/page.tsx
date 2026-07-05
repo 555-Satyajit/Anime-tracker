@@ -11,6 +11,7 @@ import { TrackerTabs } from "@/components/tracker/TrackerTabs";
 import { TrackerListWrapper } from "@/components/tracker/TrackerListWrapper";
 import { ShareProfileButton } from "@/components/tracker/ShareProfileButton";
 import { createClient } from "@/utils/supabase/server";
+import { EmailClickTracker } from "@/components/tracker/EmailClickTracker";
 
 export default async function AnimeTrackerPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | undefined }> }) {
   const params = await searchParams;
@@ -37,7 +38,8 @@ export default async function AnimeTrackerPage({ searchParams }: { searchParams:
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
+    <div className="min-h-screen bg-[#050505] text-foreground flex flex-col">
+      <EmailClickTracker />
       <Navbar />
 
       <main className="flex-1 w-full max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-16 pt-32 pb-8">
