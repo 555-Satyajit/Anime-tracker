@@ -14,7 +14,7 @@ const NAV_LINKS = [
   { name: "Home", href: "/" },
   { name: "Discover", href: "/Discover" },
   { name: "Anime Tracker", href: "/Tracker" },
-  { name: "Calendar", href: "/Calendar" },
+  { name: "Calendar", href: "/Calendar", id: "tour-nav-calendar" },
   { name: "News", href: "/News" },
   { name: "Rankings", href: "/Rankings" },
   { name: "Community", href: "/Community" },
@@ -26,10 +26,19 @@ export async function Navbar() {
   const hasAuthCookie = cookieStore.getAll().some(cookie => cookie.name.startsWith('sb-'));
 
   let user = null;
+  let profileAvatar = null;
+  let fallbackName = null;
+  
   if (hasAuthCookie) {
     const supabase = await createClient();
     const { data } = await supabase.auth.getUser();
     user = data.user;
+    
+    if (user) {
+      const { data: profile } = await supabase.from('user_profiles').select('avatar_url, username').eq('user_id', user.id).single();
+      profileAvatar = profile?.avatar_url || user.user_metadata?.avatar_url;
+      fallbackName = profile?.username || user.user_metadata?.name || user.email || "User";
+    }
   }
 
   return (
@@ -56,7 +65,7 @@ export async function Navbar() {
           </div>
           
           {user ? (
-            <UserDropdown avatarUrl={user.user_metadata?.avatar_url} />
+            <UserDropdown avatarUrl={profileAvatar} fallbackName={fallbackName} />
           ) : (
             <Link href="/login" className="hidden sm:block">
               <Button className="bg-[#e71014] hover:bg-[#c60d10] text-white font-bold px-6 rounded-xl border-none shadow-none">
@@ -65,7 +74,7 @@ export async function Navbar() {
             </Link>
           )}
 
-          <MobileMenu user={user} navLinks={NAV_LINKS} />
+          <MobileMenu user={user} profileAvatar={profileAvatar} fallbackName={fallbackName} navLinks={NAV_LINKS} />
         </div>
       </div>
     </header>

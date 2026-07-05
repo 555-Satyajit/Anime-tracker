@@ -54,7 +54,7 @@ export function CalendarHeaderControls() {
 
   return (
     <div className="flex-1 flex flex-col sm:flex-row items-center justify-between min-w-0 gap-4">
-      <div className="w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 flex justify-center sm:justify-start">
+      <div id="tour-cal-tabs" className="w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 flex justify-center sm:justify-start">
         <Tabs value={currentView} onValueChange={changeView} className="w-auto">
           <TabsList className="bg-secondary p-1 h-10">
             <TabsTrigger value="month" className="px-4 sm:px-6 data-active:!bg-[#e71014] data-active:!text-white transition-colors">Month</TabsTrigger>
@@ -64,7 +64,7 @@ export function CalendarHeaderControls() {
         </Tabs>
       </div>
       
-      <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
+      <div id="tour-cal-nav" className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
         <Button 
           variant="outline" 
           onClick={goToToday}

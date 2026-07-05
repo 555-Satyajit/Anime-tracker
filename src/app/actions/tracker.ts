@@ -115,3 +115,55 @@ export async function removeAnimeFromTracker(animeId: number) {
   revalidatePath("/Calendar");
   return { success: true };
 }
+
+export async function bulkAddAnimeToTracker(animeList: any[]) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) return { error: "Not logged in" };
+
+  const insertData = animeList.map((animeData) => {
+    let status = "Plan to Watch";
+    let episodesWatched = 0;
+
+    if (animeData.status === "FINISHED") {
+      status = "Completed";
+      episodesWatched = animeData.episodes || 0;
+    } else if (animeData.status === "RELEASING") {
+      status = "Watching";
+      episodesWatched = 0; // Safest default for currently airing anime
+    } else if (animeData.status === "NOT_YET_RELEASED") {
+      status = "Plan to Watch";
+      episodesWatched = 0;
+    } else {
+      // HIATUS or CANCELLED
+      status = "Watching";
+      episodesWatched = 0;
+    }
+
+    return {
+      user_id: user.id,
+      anime_id: animeData.id,
+      title: animeData.title.english || animeData.title.romaji,
+      cover_image: animeData.coverImage?.extraLarge || animeData.coverImage?.large,
+      status: status,
+      episodes_watched: episodesWatched,
+      total_episodes: animeData.episodes || 0,
+      genres: animeData.genres?.join(", ") || "",
+      score: 0
+    };
+  });
+
+  const { error } = await supabase
+    .from("user_anime_list")
+    .upsert(insertData, { onConflict: "user_id, anime_id" });
+
+  if (error) {
+    console.error("Error bulk tracking anime:", error);
+    return { error: error.message };
+  }
+
+  revalidatePath("/Tracker");
+  revalidatePath("/Calendar");
+  return { success: true };
+}

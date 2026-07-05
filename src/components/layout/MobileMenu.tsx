@@ -13,7 +13,7 @@ interface NavLink {
   href: string;
 }
 
-export function MobileMenu({ user, navLinks }: { user: any, navLinks: NavLink[] }) {
+export function MobileMenu({ user, profileAvatar, fallbackName, navLinks }: { user: any, profileAvatar?: string | null, fallbackName?: string | null, navLinks: NavLink[] }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -54,9 +54,9 @@ export function MobileMenu({ user, navLinks }: { user: any, navLinks: NavLink[] 
                 <PopoverTrigger className="text-left outline-none w-full hover:bg-white/5 p-2 rounded-xl transition-colors">
                   <div className="flex items-center gap-4">
                     <Avatar className="w-10 h-10 border border-white/20">
-                      <AvatarImage src={user.user_metadata?.avatar_url} />
-                      <AvatarFallback className="bg-white/10 text-white">
-                        <User className="w-5 h-5" />
+                      <AvatarImage src={profileAvatar || user.user_metadata?.avatar_url} />
+                      <AvatarFallback className="bg-[#e71014]/20 text-[#e71014] font-bold">
+                        {fallbackName ? fallbackName.charAt(0).toUpperCase() : <User className="w-5 h-5" />}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">

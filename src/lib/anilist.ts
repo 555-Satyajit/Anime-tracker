@@ -292,21 +292,43 @@ export async function getCurrentSeasonAnime(perPage = 6) {
 
 export async function getAnimeByIds(ids: number[]) {
   if (!ids.length) return [];
-  const query = `
-    query GetAnimeByIds($ids: [Int]) {
-      Page(page: 1, perPage: 50) {
-        media(id_in: $ids, type: ANIME) {
-          id
-          title { romaji english }
-          coverImage { large }
-          status
-          nextAiringEpisode { airingAt episode }
+  
+  const fetchChunk = async (chunkIds: number[]) => {
+    const query = `
+      query GetAnimeByIds($ids: [Int]) {
+        Page(page: 1, perPage: 50) {
+          media(id_in: $ids, type: ANIME) {
+            id
+            title { romaji english }
+            coverImage { large }
+            status
+            startDate { year month day }
+            nextAiringEpisode { airingAt episode }
+            relations {
+              edges {
+                relationType
+                node {
+                  id
+                  title { romaji english }
+                }
+              }
+            }
+          }
         }
       }
-    }
-  `;
-  const data = await fetchAniList(query, { ids });
-  return data.Page.media;
+    `;
+    const data = await fetchAniList(query, { ids: chunkIds });
+    return data.Page.media;
+  };
+
+  const chunkSize = 50;
+  const chunks = [];
+  for (let i = 0; i < ids.length; i += chunkSize) {
+    chunks.push(ids.slice(i, i + chunkSize));
+  }
+
+  const results = await Promise.all(chunks.map(fetchChunk));
+  return results.flat();
 }
 
 export async function getDiscoverAnime(filters: {

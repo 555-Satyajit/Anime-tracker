@@ -15,13 +15,35 @@ import { NewSeasonsAlert } from "@/components/calendar/NewSeasonsAlert";
 import { CalendarHeaderControls } from "@/components/calendar/CalendarHeaderControls";
 import { CalendarListWrapper } from "@/components/calendar/CalendarListWrapper";
 import { CalendarSkeleton } from "@/components/calendar/CalendarSkeleton";
+import { CalendarTour } from "@/components/calendar/CalendarTour";
+
+import { createClient } from "@/utils/supabase/server";
+import { redirect } from "next/navigation";
 
 export default async function CalendarPage(props: { searchParams: Promise<{ [key: string]: string | undefined }> }) {
   const searchParams = await props.searchParams;
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (user) {
+    const { data: profile } = await supabase
+      .from("user_profiles")
+      .select("avatar_url")
+      .eq("user_id", user.id)
+      .single();
+      
+    if (profile && !profile.avatar_url) {
+      redirect("/onboarding");
+    }
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-black">
       <Navbar />
       
+      <CalendarTour />
+
       <main className="flex-1 w-full max-w-[1600px] mx-auto px-4 md:px-8 lg:px-16 pt-24 md:pt-32 pb-8">
         
         {/* Header Row */}
@@ -33,13 +55,15 @@ export default async function CalendarPage(props: { searchParams: Promise<{ [key
           </div>
           
           {/* Right Side Header (Aligns with Grid) */}
-          <CalendarHeaderControls />
+          <div id="tour-cal-views">
+            <CalendarHeaderControls />
+          </div>
         </div>
 
         {/* Content Row */}
         <div className="flex flex-col lg:grid lg:grid-cols-[280px_1fr] gap-8 items-stretch">
           {/* Desktop Sidebar */}
-          <div className="hidden lg:block h-full">
+          <div className="hidden lg:block h-full" id="tour-cal-sidebar">
             <CalendarSidebar searchParams={searchParams} />
           </div>
 
@@ -62,16 +86,22 @@ export default async function CalendarPage(props: { searchParams: Promise<{ [key
             <React.Suspense fallback={<CalendarSkeleton />} key={JSON.stringify(searchParams)}>
               <CalendarListWrapper fallback={<CalendarSkeleton />}>
                 {(!searchParams.view || searchParams.view === 'month') && (
-                  <MainCalendar searchParams={searchParams} />
+                  <div id="tour-cal-grid">
+                    <MainCalendar searchParams={searchParams} />
+                  </div>
                 )}
                 
                 <div className="flex flex-col xl:flex-row gap-8 mt-8">
                   <div className="flex-1 min-w-0">
                     {(!searchParams.view || searchParams.view === 'month' || searchParams.view === 'list') && (
-                      <UpcomingSchedule searchParams={searchParams} />
+                      <div id="tour-cal-upcoming">
+                        <UpcomingSchedule searchParams={searchParams} />
+                      </div>
                     )}
                     {(!searchParams.view || searchParams.view === 'month' || searchParams.view === 'week') && (
-                      <ReleaseCalendar searchParams={searchParams} />
+                      <div id="tour-cal-weekly">
+                        <ReleaseCalendar searchParams={searchParams} />
+                      </div>
                     )}
                   </div>
                   <div className="w-full xl:w-[350px] shrink-0">

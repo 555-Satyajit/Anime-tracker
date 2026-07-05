@@ -13,6 +13,16 @@ export async function GET(request: Request) {
     const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        // If they don't have a customized profile yet, intercept them and redirect to onboarding
+        const { data: profile } = await supabase.from('user_profiles').select('avatar_url, username').eq('user_id', user.id).single()
+        
+        if (profile && (!profile.avatar_url || profile.username.length > 15)) {
+           next = '/onboarding'
+        }
+      }
+
       const forwardedHost = request.headers.get('x-forwarded-host') // original origin before load balancer
       const isLocalEnv = process.env.NODE_ENV === 'development'
       if (isLocalEnv) {

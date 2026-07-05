@@ -10,20 +10,35 @@ export async function NewSeasonsAlert() {
   
   if (!userData.user) return null;
 
+  const emptyState = (
+    <div id="tour-cal-new-seasons" className="flex flex-col gap-4 mt-8">
+      <div>
+        <h2 className="text-lg font-bold tracking-tight mb-1 flex items-center gap-2">
+          <Sparkles className="w-5 h-5 text-yellow-500" />
+          New Seasons Alert
+        </h2>
+        <p className="text-xs text-muted-foreground">Upcoming sequels to anime you've watched.</p>
+      </div>
+      <div className="rounded-xl border border-border bg-card/50 p-6 text-center text-sm text-muted-foreground">
+        No upcoming sequels detected for your tracked anime at the moment! We'll keep an eye out.
+      </div>
+    </div>
+  );
+
   // 1. Get user's tracked IDs and titles
   const { data: userAnimeList } = await supabase
     .from('user_anime_list')
     .select('anime_id, title')
     .eq('user_id', userData.user.id);
 
-  if (!userAnimeList || userAnimeList.length === 0) return null;
+  if (!userAnimeList || userAnimeList.length === 0) return emptyState;
 
   const trackedMap = new Map<number, string>();
   userAnimeList.forEach(item => trackedMap.set(item.anime_id, item.title));
 
   // 2. Fetch highly anticipated upcoming global anime
   const upcomingGlobal = await getUpcomingRelatedAnime(150); // Fetch top 150 unreleased to widen the net
-  if (!upcomingGlobal) return null;
+  if (!upcomingGlobal) return emptyState;
 
   // 3. Cross-reference relations to find if they are related to a tracked anime
   const alerts = [];
@@ -55,7 +70,7 @@ export async function NewSeasonsAlert() {
   const displayAlerts = alerts.slice(0, 3);
 
   return (
-    <div className="flex flex-col gap-4 mt-8">
+    <div id="tour-cal-new-seasons" className="flex flex-col gap-4 mt-8">
       <div>
         <h2 className="text-lg font-bold tracking-tight mb-1 flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-yellow-500" />

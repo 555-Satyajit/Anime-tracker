@@ -32,6 +32,7 @@ export function CalendarDayCell({ day, outside, selected, isEndOfWeek, isEndOfMo
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger nativeButton={false} render={
         <div 
+          id={`tour-cal-day-${day}`}
           className={`min-h-[80px] sm:min-h-[120px] p-1 sm:p-2 border-r border-b border-border/50 relative flex flex-col cursor-pointer hover:bg-white/5 transition-colors
             ${outside ? 'opacity-30' : ''}
             ${isEndOfWeek ? 'border-r-0' : ''}

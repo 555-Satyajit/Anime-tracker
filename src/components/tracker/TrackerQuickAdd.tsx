@@ -21,7 +21,11 @@ export function TrackerQuickAdd({ animeId, currentProgress, maxEpisodes }: Track
     try {
       const result = await updateAnimeProgress(animeId, currentProgress + 1);
       if (result.error) {
-        alert(result.error);
+        if (result.error === "Not logged in") {
+          window.location.href = `/login?next=${window.location.pathname}`;
+        } else {
+          alert(result.error);
+        }
       }
     } catch (e) {
       console.error(e);

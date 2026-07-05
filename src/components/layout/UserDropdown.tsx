@@ -10,10 +10,11 @@ import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 
 interface UserDropdownProps {
-  avatarUrl?: string;
+  avatarUrl?: string | null;
+  fallbackName?: string | null;
 }
 
-export function UserDropdown({ avatarUrl }: UserDropdownProps) {
+export function UserDropdown({ avatarUrl, fallbackName }: UserDropdownProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
@@ -33,10 +34,10 @@ export function UserDropdown({ avatarUrl }: UserDropdownProps) {
     <>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger className="hidden sm:block cursor-pointer outline-none">
-          <Avatar className="w-10 h-10 border border-white/20 hover:border-white/50 transition-colors">
-            <AvatarImage src={avatarUrl} />
-            <AvatarFallback className="bg-white/10 text-white">
-              <User className="w-5 h-5" />
+          <Avatar className="w-8 h-8 border border-white/20 hover:border-white/50 transition-colors">
+            <AvatarImage src={avatarUrl || undefined} />
+            <AvatarFallback className="bg-[#e71014]/20 text-[#e71014] font-bold">
+              {fallbackName ? fallbackName.charAt(0).toUpperCase() : <User className="w-5 h-5" />}
             </AvatarFallback>
           </Avatar>
         </PopoverTrigger>

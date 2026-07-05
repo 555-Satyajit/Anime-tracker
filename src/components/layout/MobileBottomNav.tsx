@@ -3,11 +3,12 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Compass, Newspaper, MessageSquare, Image } from "lucide-react";
+import { Home, Compass, Newspaper, MessageSquare, Calendar as CalendarIcon } from "lucide-react";
 
 const NAV_ITEMS = [
   { name: "Home", href: "/", icon: Home },
   { name: "Tracker", href: "/Tracker", icon: Compass },
+  { name: "Calendar", href: "/Calendar", icon: CalendarIcon, id: "tour-nav-calendar" },
   { name: "News", href: "/News", icon: Newspaper },
   { name: "Community", href: "/Community", icon: MessageSquare },
 ];
@@ -31,6 +32,7 @@ export function MobileBottomNav() {
             <Link
               key={item.name}
               href={item.href}
+              id={item.id}
               className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-colors ${
                 isActive ? "text-[#e71014]" : "text-[#888] hover:text-white"
               }`}

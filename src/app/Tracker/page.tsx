@@ -9,10 +9,32 @@ import Link from "next/link";
 import { AddAnimeModal } from "@/components/tracker/AddAnimeModal";
 import { TrackerTabs } from "@/components/tracker/TrackerTabs";
 import { TrackerListWrapper } from "@/components/tracker/TrackerListWrapper";
+import { ShareProfileButton } from "@/components/tracker/ShareProfileButton";
+import { createClient } from "@/utils/supabase/server";
 
 export default async function AnimeTrackerPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | undefined }> }) {
   const params = await searchParams;
   const currentTab = params?.status || "My List";
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  let username = null;
+  if (user) {
+    const { data: profile } = await supabase
+      .from("user_profiles")
+      .select("username, avatar_url")
+      .eq("user_id", user.id)
+      .single();
+      
+    if (profile) {
+      if (!profile.avatar_url) {
+        const { redirect } = await import("next/navigation");
+        redirect("/onboarding");
+      }
+      username = profile.username;
+    }
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -26,10 +48,15 @@ export default async function AnimeTrackerPage({ searchParams }: { searchParams:
             <p className="text-muted-foreground">Track your journey. Every episode counts.</p>
           </div>
           <div className="flex items-center gap-4">
+            <div id="tour-share-profile">
+              <ShareProfileButton username={username} />
+            </div>
             <Button variant="outline" className="bg-transparent border-border hover:bg-card/50">
               Import List
             </Button>
-            <AddAnimeModal />
+            <div id="tour-add-anime">
+              <AddAnimeModal />
+            </div>
           </div>
         </div>
 
@@ -37,7 +64,7 @@ export default async function AnimeTrackerPage({ searchParams }: { searchParams:
         <TrackerTabs defaultTab={currentTab} />
 
         {/* Stats Row */}
-        <div className="mb-8">
+        <div className="mb-8" id="tour-stats">
           <React.Suspense fallback={<TrackerStatsSkeleton />}>
             <TrackerStats />
           </React.Suspense>
@@ -55,7 +82,7 @@ export default async function AnimeTrackerPage({ searchParams }: { searchParams:
           </div>
 
           {/* Right Column - Sidebar */}
-          <div className="w-full shrink-0">
+          <div className="w-full shrink-0" id="tour-sidebar">
             <React.Suspense fallback={<TrackerSidebarSkeleton />}>
               <TrackerSidebar />
             </React.Suspense>

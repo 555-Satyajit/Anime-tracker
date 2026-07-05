@@ -23,9 +23,17 @@ CREATE TABLE public.user_anime_list (
 ALTER TABLE public.user_anime_list ENABLE ROW LEVEL SECURITY;
 
 -- 3. Create Security Policies (Users can only see and edit their OWN list)
-CREATE POLICY "Users can view their own anime list."
+CREATE POLICY "Anime lists are viewable if profile is public or user is owner"
   ON public.user_anime_list FOR SELECT
-  USING (auth.uid() = user_id);
+  USING (
+    auth.uid() = user_id 
+    OR 
+    EXISTS (
+      SELECT 1 FROM public.user_profiles 
+      WHERE user_profiles.user_id = user_anime_list.user_id 
+      AND user_profiles.allow_public_list = true
+    )
+  );
 
 CREATE POLICY "Users can insert into their own anime list."
   ON public.user_anime_list FOR INSERT

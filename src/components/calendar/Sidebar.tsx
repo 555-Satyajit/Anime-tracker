@@ -222,6 +222,7 @@ export function CalendarSidebar({ searchParams }: { searchParams?: { [key: strin
           loop 
           muted 
           playsInline 
+          poster="/wallpaper.png"
           className="absolute inset-0 w-full h-full object-cover z-0 opacity-40 mix-blend-screen"
         >
           <source src="https://res.cloudinary.com/dvbijacjy/video/upload/Video_Project_18_nbqwu5.mp4" type="video/mp4" />

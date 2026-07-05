@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useTrackerStore } from "./tracker-store";
 
 export function TrackerTabs({ defaultTab }: { defaultTab: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const { setIsNavigating } = useTrackerStore();
   const currentStatusParam = searchParams.get("status");
   const currentTab = currentStatusParam || defaultTab;
@@ -44,7 +45,7 @@ export function TrackerTabs({ defaultTab }: { defaultTab: string }) {
               e.preventDefault();
               setOptTab(tab);
               setIsNavigating(true);
-              router.push(href);
+              router.push(`${pathname}${queryParams.toString() ? '?' + queryParams.toString() : ''}`);
             }}
             className={`pb-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
               optTab === tab

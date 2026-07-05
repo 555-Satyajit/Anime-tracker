@@ -19,6 +19,7 @@ export async function HeroSection() {
             loop 
             muted 
             playsInline 
+            poster="/wallpaper.png"
             className="w-full h-full object-cover object-[center_top] opacity-100"
           >
             <source src="https://res.cloudinary.com/dvbijacjy/video/upload/Video_Project_18_nbqwu5.mp4" type="video/mp4" />

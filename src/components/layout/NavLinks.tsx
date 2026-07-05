@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export function NavLinks({ links }: { links: { name: string; href: string }[] }) {
+export function NavLinks({ links }: { links: { name: string; href: string; id?: string }[] }) {
   const pathname = usePathname();
 
   return (
@@ -20,6 +20,7 @@ export function NavLinks({ links }: { links: { name: string; href: string }[] })
           <Link 
             key={link.name} 
             href={link.href} 
+            id={link.id}
             className={`group relative text-sm font-semibold transition-colors py-1 ${
               isActive ? "text-white" : "text-[#888] hover:text-white"
             }`}
