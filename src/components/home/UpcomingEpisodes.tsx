@@ -57,7 +57,7 @@ export function UpcomingEpisodes({ episodes }: { episodes?: any[] }) {
                     <span className="text-sm font-black text-white leading-none">{date}</span>
                   </div>
 
-                  <img src={ep.media.coverImage.large} alt="" className="w-8 h-8 rounded object-cover bg-white/5 shrink-0" />
+                  <img src={ep.media.coverImage.large} alt={`${ep.media.title.english || ep.media.title.romaji} cover`} className="w-8 h-8 rounded object-cover bg-white/5 shrink-0" />
                   <div className="flex-1 min-w-0">
                     <h4 className="text-[13px] font-bold text-white line-clamp-1 group-hover:line-clamp-none transition-all mb-0.5">{ep.media.title.english || ep.media.title.romaji}</h4>
                     <p className="text-[10px] text-[#888] truncate">Episode {ep.episode}</p>

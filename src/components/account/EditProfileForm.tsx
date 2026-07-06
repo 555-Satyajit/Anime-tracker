@@ -113,7 +113,7 @@ export function EditProfileForm({ user, initialProfile }: EditProfileFormProps) 
         <div className="flex items-center gap-6">
           <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-white/10 group cursor-pointer bg-white/5">
             {avatarUrl ? (
-              <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+              <img src={avatarUrl} alt={`${username || 'User'}'s Avatar`} className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-white/50 text-2xl font-bold">
                 {username ? username.substring(0, 2).toUpperCase() : "?"}

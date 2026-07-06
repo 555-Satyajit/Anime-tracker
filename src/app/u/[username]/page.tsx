@@ -9,7 +9,26 @@ import { TrackerList, TrackerListSkeleton } from "@/components/tracker/TrackerLi
 import { TrackerListWrapper } from "@/components/tracker/TrackerListWrapper";
 import { Footer } from "@/components/layout/Footer";
 
+import type { Metadata } from "next";
+
 export const dynamic = 'force-dynamic';
+
+export async function generateMetadata({ params }: { params: Promise<{ username: string }> }): Promise<Metadata> {
+  const { username } = await params;
+  const supabase = await createClient();
+  const { data: profile } = await supabase
+    .from("user_profiles")
+    .select("username, bio")
+    .ilike("username", username)
+    .single();
+
+  if (!profile) return { title: "Profile Not Found | SENKAI" };
+
+  return {
+    title: `${profile.username}'s Anime Tracker | SENKAI`,
+    description: profile.bio || `View ${profile.username}'s anime watchlist, ratings, and stats on SENKAI.`,
+  };
+}
 
 export default async function PublicProfilePage({ 
   params,
@@ -57,8 +76,25 @@ export default async function PublicProfilePage({
   const avatarUrl = profile.avatar_url || `/Avatars/1.svg`;
   const bannerUrl = profile.banner_url || "https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=2000&auto=format&fit=crop";
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    "mainEntity": {
+      "@type": "Person",
+      "name": displayName,
+      "alternateName": profile.username,
+      "description": profile.bio || `Anime tracker profile for ${displayName}.`,
+      "image": avatarUrl,
+      "url": `https://www.senkaihub.com/u/${profile.username}`
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col text-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Navbar />
       
       <main className="flex-1 w-full max-w-[1200px] mx-auto px-4 sm:px-8 lg:px-16 pt-24 pb-16">
@@ -66,7 +102,7 @@ export default async function PublicProfilePage({
         {/* Profile Header */}
         <div className="relative rounded-2xl overflow-hidden mb-12 shadow-2xl">
           <div className="h-48 md:h-64 w-full relative">
-            <img src={bannerUrl} alt="banner" className="w-full h-full object-cover" />
+            <img src={bannerUrl} alt={`${displayName}'s banner`} className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
           </div>
           

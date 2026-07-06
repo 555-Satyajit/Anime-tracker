@@ -34,7 +34,7 @@ export function WallpaperBottom({ popularWallpapers = [] }: WallpaperBottomProps
           </div>
 
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent z-0"></div>
-          {displayWallpapers[0]?.url && <img src={displayWallpapers[0].url} className="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity" />}
+          {displayWallpapers[0]?.url && <img src={displayWallpapers[0].url} alt="Collection Background" className="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:opacity-30 transition-opacity" />}
         </Link>
 
         {/* Popular This Week */}
@@ -76,7 +76,7 @@ export function WallpaperBottom({ popularWallpapers = [] }: WallpaperBottomProps
           <div className="hidden lg:flex -space-x-2 opacity-50">
             {displayWallpapers.slice(0,4).map((wp, i) => wp.url ? (
               <div key={i} className="w-10 h-10 rounded-md bg-secondary border border-border overflow-hidden">
-                <img src={wp.url} alt="" className="w-full h-full object-cover" />
+                <img src={wp.url} alt={`Favorite ${i + 1}`} className="w-full h-full object-cover" />
               </div>
             ) : null)}
           </div>

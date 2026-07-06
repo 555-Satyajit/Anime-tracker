@@ -140,7 +140,7 @@ export default function OnboardingPage() {
             <h2 className="text-xl text-muted-foreground font-medium mb-8">Your new identity is...</h2>
             
             <div className="w-40 h-40 md:w-48 md:h-48 rounded-full border-4 border-background overflow-hidden bg-muted shadow-2xl mb-6 relative group">
-              <img src={generatedAvatar} alt="Avatar Preview" className="w-full h-full object-cover" />
+              <img src={generatedAvatar} alt={`${generatedName}'s Avatar Preview`} className="w-full h-full object-cover" />
             </div>
             
             <div className="text-3xl md:text-5xl font-black mb-8 text-center text-transparent bg-clip-text bg-gradient-to-r from-white to-white/70">

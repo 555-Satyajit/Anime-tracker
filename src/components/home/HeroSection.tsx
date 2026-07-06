@@ -44,13 +44,12 @@ export async function HeroSection() {
           </p>
           
           <h1 className="text-5xl md:text-[64px] font-black text-white leading-[1.05] mb-3 tracking-tight">
-            YOUR ANIME <br />
-            <span className="text-[#e71014]">JOURNEY.</span>
+            MODERN ANIME <br />
+            <span className="text-[#e71014]">TRACKER.</span>
           </h1>
           
-          <p className="text-sm md:text-[15px] text-[#888] max-w-[440px] mb-5 leading-snug font-medium">
-          Track your favorite anime, get real-time updates, discover new shows,
-          and immerse in stunning anime wallpapers.
+          <p className="text-sm md:text-[15px] text-[#888] max-w-[480px] mb-5 leading-snug font-medium">
+            SENKAI is a modern anime tracker that helps you manage your anime watchlist, track episodes, organize your favorite series into custom folders, and never miss a release.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 mb-2">

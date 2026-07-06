@@ -101,7 +101,7 @@ export function CalendarDayCell({ day, outside, selected, isEndOfWeek, isEndOfMo
 
               return (
                 <div key={ep.id} className="flex gap-4 p-3 rounded-lg border border-white/5 bg-white/5 hover:bg-white/10 transition-colors">
-                  <img src={ep.media.coverImage?.large} alt="cover" className="w-12 h-16 object-cover rounded shadow-md shrink-0" />
+                  <img src={ep.media.coverImage?.large} alt={`${title} cover`} className="w-12 h-16 object-cover rounded shadow-md shrink-0" />
                   <div className="flex flex-col flex-1 min-w-0 justify-center">
                     <h4 className="font-bold text-sm truncate">{title}</h4>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">

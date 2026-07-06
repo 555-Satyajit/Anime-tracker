@@ -106,7 +106,7 @@ export async function NewSeasonsAlert() {
             <div key={anime.id} className="relative rounded-xl border border-yellow-500/20 bg-gradient-to-b from-yellow-500/10 to-transparent p-4 overflow-hidden">
               <div className="flex gap-4">
                 <div className="w-14 h-20 shrink-0 rounded-md overflow-hidden shadow-lg shadow-black/50 border border-white/10">
-                  <img src={anime.coverImage?.large} alt="cover" className="w-full h-full object-cover" />
+                  <img src={anime.coverImage?.large} alt={`${title} cover`} className="w-full h-full object-cover" />
                 </div>
                 
                 <div className="flex flex-col min-w-0 flex-1">
