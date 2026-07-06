@@ -175,12 +175,16 @@ export async function TrackerList({
 
     return {
       id: rep.anime_id, // Use the representative's ID as the folder ID
+      anime_id: rep.anime_id, // Required for EditAnimeModal
       isFolder: clusterItems.length > 1,
       items: clusterItems,
       title: repAniData?.title?.english || repAniData?.title?.romaji || rep.title,
       cover_image: repAniData?.coverImage?.large || rep.cover_image,
       genres: rep.genres,
       status: rep.status, // Primary status
+      episodes_watched: rep.episodes_watched,
+      total_episodes: rep.total_episodes,
+      score: rep.score,
       totalEpisodes,
       watchedEpisodes,
       latestUpdated,
