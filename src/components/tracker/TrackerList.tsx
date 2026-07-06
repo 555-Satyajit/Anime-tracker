@@ -126,8 +126,13 @@ export async function TrackerList({
     if (aniData?.relations?.edges) {
       aniData.relations.edges.forEach((edge: any) => {
         const relatedId = edge.node.id;
+        const type = edge.relationType;
+        
+        // Skip loose relationships like "OTHER" (same author/crossovers) or "CHARACTER"
+        if (type === "OTHER" || type === "CHARACTER") return;
+
         if (validIds.includes(relatedId)) {
-          // We only cluster valid relations (avoiding characters/staff if they somehow sneak in, though type is ANIME)
+          // We only cluster valid relations
           uf.union(id, relatedId);
         }
       });
@@ -172,7 +177,7 @@ export async function TrackerList({
       id: rep.anime_id, // Use the representative's ID as the folder ID
       isFolder: clusterItems.length > 1,
       items: clusterItems,
-      title: repAniData?.title?.romaji || repAniData?.title?.english || rep.title,
+      title: repAniData?.title?.english || repAniData?.title?.romaji || rep.title,
       cover_image: repAniData?.coverImage?.large || rep.cover_image,
       genres: rep.genres,
       status: rep.status, // Primary status
@@ -251,6 +256,9 @@ export async function TrackerList({
     const nextEp = aniData?.nextAiringEpisode;
     const globalStatus = aniData?.status;
     
+    // Prefer English over Romaji (Japanese)
+    const displayTitle = aniData?.title?.english || aniData?.title?.romaji || entity.title;
+    
     let nextEpTitle = "TBA";
     let nextEpDate = "TBA";
     let nextEpDateClass = "text-muted-foreground";
@@ -295,7 +303,7 @@ export async function TrackerList({
 
         {/* Image */}
         <div className={view === "grid" ? "w-full aspect-[3/4] rounded-md overflow-hidden shrink-0 shadow-md mb-3" : "w-20 h-28 rounded-md overflow-hidden shrink-0 shadow-md"}>
-          <img src={entity.cover_image} alt={entity.title} className="w-full h-full object-cover" />
+          <img src={entity.cover_image} alt={displayTitle} className="w-full h-full object-cover" />
         </div>
         
         {/* Right Side Content Wrapper */}
@@ -303,8 +311,8 @@ export async function TrackerList({
           {/* Info Column */}
           <div id={idx === 0 ? "tour-anime-card" : undefined} className={view === "grid" ? "flex flex-col flex-1 min-w-0 w-full" : "flex flex-col flex-1 min-w-0 py-1 w-full"}>
           <div className="flex items-center gap-2 mb-1 w-full pr-10 sm:pr-0">
-            <h3 className={`font-bold text-white line-clamp-2 flex-1 min-w-0 ${view === "grid" ? "text-base" : "text-lg"}`} title={entity.title}>
-              {entity.title}
+            <h3 className={`font-bold text-white line-clamp-2 flex-1 min-w-0 ${view === "grid" ? "text-base" : "text-lg"}`} title={displayTitle}>
+              {displayTitle}
             </h3>
           </div>
           <p className="text-xs text-muted-foreground truncate mb-3 w-full">
