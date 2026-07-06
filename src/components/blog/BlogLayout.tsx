@@ -19,6 +19,28 @@ interface BlogLayoutProps {
 export function BlogLayout({ category, categoryHref, title, subtitle, date, readTime, heroImg, children }: BlogLayoutProps) {
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-foreground flex flex-col font-sans">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Article",
+            "headline": title,
+            "description": subtitle,
+            "image": [
+              heroImg.startsWith('http') ? heroImg : `https://www.senkaihub.com${heroImg}`
+            ],
+            "datePublished": new Date(date).toISOString(),
+            "dateModified": new Date(date).toISOString(),
+            "author": [{
+              "@type": "Person",
+              "name": "SENKAI Team",
+              "url": "https://www.senkaihub.com/"
+            }]
+          })
+        }}
+      />
+      
       <Navbar />
 
       <main className="flex-1 w-full max-w-[1400px] mx-auto px-6 pt-32 pb-24 flex flex-col lg:flex-row gap-12">

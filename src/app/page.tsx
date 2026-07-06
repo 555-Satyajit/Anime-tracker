@@ -19,6 +19,35 @@ export const dynamic = 'force-dynamic';
 export default function Home() {
   return (
     <div className="min-h-screen relative flex flex-col font-sans bg-black">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            {
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "SENKAI",
+              "url": "https://www.senkaihub.com/",
+              "potentialAction": {
+                "@type": "SearchAction",
+                "target": "https://www.senkaihub.com/Tracker?q={search_term_string}",
+                "query-input": "required name=search_term_string"
+              }
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "SENKAI",
+              "url": "https://www.senkaihub.com/",
+              "logo": "https://www.senkaihub.com/favicon.png",
+              "sameAs": [
+                "https://twitter.com/senkaihub",
+                "https://discord.gg/senkai"
+              ]
+            }
+          ])
+        }}
+      />
       
       {/* Hero Wrapper: Encapsulates Video + Content to prevent leaking */}
       <div className="relative w-full h-[500px] lg:h-[550px] flex flex-col items-center">

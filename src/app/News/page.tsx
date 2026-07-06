@@ -22,6 +22,23 @@ export default async function NewsPage() {
       <Navbar />
 
       <main className="flex-1 w-full max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-16 pt-32 pb-8">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "ItemList",
+              "name": "Latest Anime News",
+              "url": "https://www.senkaihub.com/News",
+              "itemListElement": newsItems.map((item, index) => ({
+                "@type": "ListItem",
+                "position": index + 1,
+                "url": item.link,
+                "name": item.title
+              }))
+            })
+          }}
+        />
         
         {/* Top Hero Area */}
         <NewsHero />

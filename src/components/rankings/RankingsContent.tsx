@@ -20,5 +20,26 @@ export async function RankingsContent({ category, page }: { category: string, pa
     animeData = await getTopAnime(page, 20);
   }
 
-  return <RankingsList animeList={animeData} currentPage={page} category={category} />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "name": `SENKAI Rankings - ${category}`,
+            "itemListOrder": "https://schema.org/ItemListOrderAscending",
+            "itemListElement": animeData.map((item, index) => ({
+              "@type": "ListItem",
+              "position": (page - 1) * 20 + index + 1,
+              "url": `https://www.senkaihub.com/anime/${item.id}`,
+              "name": item.title?.english || item.title?.romaji || item.name?.full || "Unknown"
+            }))
+          })
+        }}
+      />
+      <RankingsList animeList={animeData} currentPage={page} category={category} />
+    </>
+  );
 }
