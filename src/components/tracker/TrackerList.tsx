@@ -369,13 +369,9 @@ export async function TrackerList({
               ) : (
                 <>
                   {watched} <span className="text-sm text-muted-foreground font-medium">/ {total || '?'}</span>
-                  {!isFolder && (
+                  {!isFolder && !isReadOnly && (
                     <div id={idx === 0 ? "tour-quick-add" : undefined}>
-                      {!isReadOnly ? (
-                        <TrackerQuickAdd animeId={entity.anime_id} currentProgress={watched} maxEpisodes={total || 0} />
-                      ) : (
-                        <span className="text-xs font-semibold text-muted-foreground">{watched} / {total || "?"} eps</span>
-                      )}
+                      <TrackerQuickAdd animeId={entity.anime_id} currentProgress={watched} maxEpisodes={total || 0} />
                     </div>
                   )}
                 </>
