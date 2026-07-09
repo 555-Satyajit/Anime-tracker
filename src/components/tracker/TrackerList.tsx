@@ -100,20 +100,11 @@ export async function TrackerList({
   }
 
   // 3. Filter by Format (which relies on AniList data)
-  if (format && format !== "All Formats") {
-    // Basic mapping: TV includes TV and TV_SHORT, etc.
-    let targetFormat = format;
-    if (format === "TV Shows") targetFormat = "TV";
-    if (format === "Movies") targetFormat = "MOVIE";
-    if (format === "OVAs") targetFormat = "OVA";
-
+  if (format && format !== "All Formats" && format !== "All") {
     animeList = animeList.filter(a => {
       const aniData = anilistDataMap[a.anime_id];
       if (!aniData) return true;
-      if (targetFormat === "TV") return aniData.format === "TV" || aniData.format === "TV_SHORT";
-      if (targetFormat === "MOVIE") return aniData.format === "MOVIE";
-      if (targetFormat === "OVA") return aniData.format === "OVA" || aniData.format === "SPECIAL" || aniData.format === "ONA";
-      return aniData.format === targetFormat;
+      return aniData.format?.toUpperCase() === format.toUpperCase();
     });
   }
 
@@ -466,7 +457,13 @@ export async function TrackerList({
       {/* Anime List */}
       <div className={displayItems.length === 0 ? "" : (view === "grid" ? "grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 min-h-[300px]" : "flex flex-col min-h-[300px]")}>
         {displayItems.length === 0 ? (
-          !isReadOnly ? <TrackerOnboarding trendingAnime={trendingAnimeForOnboarding} /> : <div className="text-center py-20 text-muted-foreground">This user has no anime in their list yet.</div>
+          ((status && status !== "My List" && status !== "All") || search || (genre && genre !== "All Genres" && genre !== "All") || (format && format !== "All Formats" && format !== "All")) ? (
+            <div className="text-center py-20 text-muted-foreground">No anime match the selected filters.</div>
+          ) : !isReadOnly ? (
+            <TrackerOnboarding trendingAnime={trendingAnimeForOnboarding} />
+          ) : (
+            <div className="text-center py-20 text-muted-foreground">This user has no anime in their list yet.</div>
+          )
         ) : (
           displayItems.map((item, idx) => renderCard(item, idx))
         )}

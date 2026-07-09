@@ -41,14 +41,20 @@ export default function OnboardingPage() {
     const adjList = adjectives[vibe];
     const nounList = nouns[vibe];
     
-    const adj = adjList[Math.floor(Math.random() * adjList.length)];
-    const noun = nounList[Math.floor(Math.random() * nounList.length)];
-    const suffix = Math.floor(Math.random() * 99) + 1;
+    const getSecureRandomInt = (max: number) => {
+      const array = new Uint32Array(1);
+      window.crypto.getRandomValues(array);
+      return array[0] % max;
+    };
+    
+    const adj = adjList[getSecureRandomInt(adjList.length)];
+    const noun = nounList[getSecureRandomInt(nounList.length)];
+    const suffix = getSecureRandomInt(99) + 1;
     
     const newName = `${adj}${noun}${suffix}`;
     
     // Pick a random avatar from the 380 local SVGs
-    const randomAvatarNum = Math.floor(Math.random() * 380) + 1;
+    const randomAvatarNum = getSecureRandomInt(380) + 1;
     const newAvatar = `/Avatars/${randomAvatarNum}.svg`;
     
     setGeneratedName(newName);

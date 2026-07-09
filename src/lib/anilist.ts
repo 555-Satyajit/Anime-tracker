@@ -301,6 +301,7 @@ export async function getAnimeByIds(ids: number[]) {
             id
             title { romaji english }
             coverImage { large }
+            format
             status
             startDate { year month day }
             nextAiringEpisode { airingAt episode }

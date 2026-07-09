@@ -1,134 +1,272 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { CommunityHero } from "@/components/community/CommunityHero";
 import { CommunityComposer } from "@/components/community/CommunityComposer";
+import { MobileComposerFAB } from "@/components/community/MobileComposerFAB";
 import { FeedCard } from "@/components/community/FeedCard";
-import { TrendingTopics, ActivePollsSidebar, OnlineMembers } from "@/components/community/CommunitySidebar";
-import { CommunityBottomCards } from "@/components/community/CommunityBottomCards";
-import { Button } from "@/components/ui/button";
-import { Plus, Repeat2 } from "lucide-react";
+import { CommunityLeftSidebar } from "@/components/community/CommunityLeftSidebar";
+import { CommunityMobileTabs } from "@/components/community/CommunityMobileTabs";
+import { CommunityRightSidebar } from "@/components/community/CommunityRightSidebar";
+import { FeedSkeleton } from "@/components/community/FeedSkeleton";
+import { Repeat2 } from "lucide-react";
+import { createClient } from "@/utils/supabase/server";
+import Link from "next/link";
 
-export default function CommunityPage() {
-  
-  // Mock Data for the Feed
-  const feedPosts = [
-    {
-      id: "1",
-      user: { username: "Akira_07", avatar: "/avatars/Akira_07.jpg", badge: "Top Contributor", badgeColor: "purple" as const },
-      timeAgo: "2h ago",
-      title: "Jujutsu Kaisen Season 3 - What are your expectations?",
-      category: { name: "Discussion", color: "bg-purple-500/20 text-purple-400" },
-      content: "With the Shibuya Incident arc just getting started in Season 2, I can't even imagine how crazy Season 3 is going to be. What moments are you most hyped for?\nLet's discuss!",
-      image: "/images/banners/jjk-hero.jpg",
-      stats: { likes: 342, comments: 89, reposts: 23 }
-    },
-    {
-      id: "2",
-      user: { username: "MangaLover", avatar: "/avatars/MangaLover.jpg", badge: "Elite Member", badgeColor: "orange" as const },
-      timeAgo: "4h ago",
-      title: "Solo Leveling Episode 12 was INSANE 🔥",
-      category: { name: "Anime Talk", color: "bg-red-500/20 text-red-400" },
-      content: "The animation this week was on another level! Sung Jinwoo is built different 🤯\nCan't wait for next week's episode!",
-      image: "/images/posters/solo-leveling.jpg",
-      stats: { likes: 512, comments: 142, reposts: 31 }
-    },
-    {
-      id: "3",
-      user: { username: "ArtByShiro", avatar: "/avatars/ArtByShiro.jpg", badge: "Artist", badgeColor: "green" as const },
-      timeAgo: "6h ago",
-      title: "Fan Art: Demon Slayer - Tanjiro Kamado",
-      category: { name: "Fan Art", color: "bg-green-500/20 text-green-400" },
-      content: "Had fun drawing this! Hope you all like it 😊\n#DemonSlayer #Tanjiro #FanArt",
-      image: "/images/posters/demon-slayer.jpg",
-      stats: { likes: 734, comments: 58, reposts: 27 }
-    },
-    {
-      id: "4",
-      user: { username: "WeebNinja", avatar: "/avatars/WeebNinja.jpg" },
-      timeAgo: "8h ago",
-      title: "Which anime has the best world-building?",
-      category: { name: "Poll", color: "bg-yellow-500/20 text-yellow-400" },
-      content: "So many great anime with amazing worlds. Let's see which one stands out!",
-      poll: {
-        totalVotes: 3740,
-        timeLeft: "1d",
-        options: [
-          { id: "o1", text: "Attack on Titan", votes: 1200, percentage: 29 },
-          { id: "o2", text: "Fullmetal Alchemist: Brotherhood", votes: 1600, percentage: 37, isWinner: true },
-          { id: "o3", text: "Hunter x Hunter", votes: 900, percentage: 20 },
-          { id: "o4", text: "One Piece", votes: 640, percentage: 14 }
-        ]
-      },
-      stats: { likes: 245, comments: 196, reposts: 12 }
-    }
-  ];
+export const dynamic = "force-dynamic";
+
+// Time ago utility
+function formatTimeAgo(dateString: string) {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  return `${diffDays}d ago`;
+}
+
+export default async function CommunityPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ filter?: string, limit?: string }>;
+}) {
+  // Safe resolution for Next.js 15+ where searchParams might be a Promise
+  const params = await searchParams;
+  const filter = params?.filter;
+  const limit = parseInt(params?.limit || "10", 10);
 
   return (
-    <div className="min-h-screen bg-black text-foreground flex flex-col font-sans">
-      <Navbar />
-      
-      <main className="flex-1 w-full flex flex-col">
+    <>
+      <div className="max-w-[1440px] mx-auto flex gap-6 lg:gap-8 justify-center min-h-screen">
         
-        {/* Top Hero Section */}
-        <CommunityHero />
-
-        <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Left Column: Navigation Sidebar (Desktop) */}
+        <CommunityLeftSidebar activeTab={filter as any || 'all'} />
+        
+        {/* Center Column: Feed */}
+        <div className="flex-1 flex flex-col min-w-0 max-w-2xl py-6">
           
-          {/* Main Navigation Tabs */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4 py-4 border-b border-white/5">
-            <div className="flex items-center gap-6 overflow-x-auto no-scrollbar">
-              <button className="text-white font-bold border-b-2 border-[#e71014] pb-1 whitespace-nowrap">Feed</button>
-              <button className="text-[#888] hover:text-white font-medium pb-1 transition-colors whitespace-nowrap">Discussions</button>
-              <button className="text-[#888] hover:text-white font-medium pb-1 transition-colors whitespace-nowrap">Fan Art</button>
-              <button className="text-[#888] hover:text-white font-medium pb-1 transition-colors whitespace-nowrap">Polls</button>
-              <button className="text-[#888] hover:text-white font-medium pb-1 transition-colors whitespace-nowrap">Clubs</button>
-              <button className="text-[#888] hover:text-white font-medium pb-1 transition-colors whitespace-nowrap">Members</button>
+          {/* Feed Navigation Tabs (Mobile Only) */}
+          <CommunityMobileTabs activeTab={filter as any || 'all'} />
+
+          <Suspense key={`${filter}-${limit}`} fallback={
+            <div className="w-full">
+               <div className="hidden lg:block mb-6"><div className="h-[120px] bg-[#111] border border-white/10 rounded-2xl animate-pulse"></div></div>
+               <FeedSkeleton />
             </div>
-            
-            <Button className="bg-[#e71014] hover:bg-[#c10d10] text-white font-bold rounded-lg shrink-0">
-              <Plus className="w-4 h-4 mr-2" />
-              Create Post
-            </Button>
-          </div>
-
-          {/* Grid Layout for Feed and Sidebar */}
-          <div className="grid grid-cols-1 xl:grid-cols-[1fr_320px] gap-8">
-            
-            {/* Left Column: Feed */}
-            <div className="flex flex-col min-w-0">
-              <CommunityComposer />
-              
-              <div className="flex flex-col gap-2">
-                {feedPosts.map((post) => (
-                  <FeedCard key={post.id} {...post} />
-                ))}
-              </div>
-
-              <div className="flex justify-center mt-6">
-                <button className="flex items-center gap-2 text-[#888] hover:text-white transition-colors">
-                  <Repeat2 className="w-4 h-4" />
-                  <span className="text-sm font-medium">Load More Posts</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Right Column: Sidebar */}
-            <div className="hidden xl:flex flex-col w-full shrink-0">
-              <TrendingTopics />
-              <ActivePollsSidebar />
-              <OnlineMembers />
-            </div>
-
-          </div>
-
-          {/* Bottom Cards */}
-          <CommunityBottomCards />
-
+          }>
+            <FeedContent filter={filter} limit={limit} />
+          </Suspense>
         </div>
-      </main>
 
-      <Footer />
-    </div>
+        {/* Right Column: Sidebar (Desktop) */}
+        <CommunityRightSidebar />
+
+      </div>
+    </>
+  );
+}
+
+async function FeedContent({ filter, limit = 10 }: { filter?: string, limit?: number }) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  // Fetch logged in user's profile avatar
+  let userAvatar = "";
+  if (user) {
+    const { data: profile } = await supabase
+      .from("user_profiles")
+      .select("avatar_url")
+      .eq("user_id", user.id)
+      .single();
+    userAvatar = profile?.avatar_url || "";
+  }
+
+  // Fetch posts with profiles and polls
+  let query = supabase
+    .from("community_posts")
+    .select(`
+      *,
+      user:user_profiles!user_id (
+        username,
+        avatar_url,
+        badge
+      ),
+      clan:clans (
+        id,
+        name,
+        is_private
+      ),
+      polls (
+        id,
+        ends_at,
+        options:poll_options (
+          id,
+          option_text,
+          votes_count
+        )
+      ),
+      comments:post_comments (
+        id,
+        content,
+        created_at,
+        user_id,
+        user:user_profiles!user_id (
+          username,
+          avatar_url,
+          badge
+        )
+      )
+    `);
+
+  // Apply filters
+  if (filter === "discussions") {
+    query = query.in("category", ["Discussion", "General", "Theory", "Question", "Review", "Recommendation", "Manga Spoilers", "News", "Suggestions", "Fan Art", "Help", "Anime Talk"]);
+  } else if (filter === "polls") {
+    query = query.eq("category", "Poll");
+  }
+
+  const { data: postsData, error: postsError } = await query
+    .order("created_at", { ascending: false })
+    .limit(limit)
+    .limit(4, { foreignTable: 'post_comments' });
+
+  if (postsError) {
+    console.error("Posts fetch error:", postsError);
+  }
+
+  // Get user's likes and bookmarks for initial states
+  let likedPostIds = new Set<string>();
+  let bookmarkedPostIds = new Set<string>();
+  let votedPollOptionIds = new Map<string, string>(); // poll_id -> option_id
+
+  if (user && postsData && postsData.length > 0) {
+    const postIds = postsData.map((p: any) => p.id);
+    const pollIds = postsData.flatMap((p: any) => 
+      p.polls ? (Array.isArray(p.polls) ? p.polls : [p.polls]).map((poll: any) => poll.id) : []
+    );
+
+    const [likesRes, bookmarksRes, votesRes] = await Promise.all([
+      supabase.from("post_likes").select("post_id").eq("user_id", user.id).in("post_id", postIds),
+      supabase.from("post_bookmarks").select("post_id").eq("user_id", user.id).in("post_id", postIds),
+      pollIds.length > 0 
+        ? supabase.from("poll_votes").select("poll_id, option_id").eq("user_id", user.id).in("poll_id", pollIds)
+        : Promise.resolve({ data: [], error: null })
+    ]);
+
+    if (likesRes.error) console.error("Likes error:", likesRes.error);
+    if (bookmarksRes.error) console.error("Bookmarks error:", bookmarksRes.error);
+    if (votesRes.error) console.error("Votes error:", votesRes.error);
+
+    if (likesRes.data) {
+      likedPostIds = new Set(likesRes.data.map((l: any) => l.post_id));
+    }
+    if (bookmarksRes.data) {
+      bookmarkedPostIds = new Set(bookmarksRes.data.map((b: any) => b.post_id));
+    }
+    if (votesRes.data) {
+      votesRes.data.forEach((v: any) => {
+        votedPollOptionIds.set(v.poll_id, v.option_id);
+      });
+    }
+  }
+
+  const posts = (postsData || [])
+    .map((post: any) => {
+    // Check if there is an associated poll
+    let poll = undefined;
+    if (post.polls) {
+      const dbPoll = Array.isArray(post.polls) ? post.polls[0] : post.polls;
+      if (dbPoll) {
+        poll = {
+          id: dbPoll.id,
+          endsAt: dbPoll.ends_at,
+          options: dbPoll.options || [],
+          hasVotedOptionId: votedPollOptionIds.get(dbPoll.id) || null
+        };
+      }
+    }
+
+    // Format comments for preview - only show first 4
+    const previewComments = (post.comments || [])
+      .map((c: any) => ({
+        id: c.id,
+        content: c.content,
+        created_at: c.created_at,
+        user: {
+          username: c.user?.username || "Anonymous",
+          avatar_url: c.user?.avatar_url || ""
+        }
+      }))
+      .slice(0, 4);
+
+    return {
+      id: post.id,
+      user: {
+        username: post.user?.username || "Anonymous",
+        avatar: post.user?.avatar_url || "",
+        badge: post.user?.badge || null,
+        badgeColor: "purple" as const
+      },
+      timeAgo: formatTimeAgo(post.created_at),
+      content: post.content,
+      category: post.category,
+      likesCount: post.likes_count || 0,
+      commentsCount: post.comments_count || 0,
+      isSpoiler: post.is_spoiler,
+      isSpoilerVault: post.is_spoiler_vault,
+      isLikedInitially: likedPostIds.has(post.id),
+      isBookmarkedInitially: bookmarkedPostIds.has(post.id),
+      hasCommentedInitially: post.comments?.some((c: any) => c.user_id === user?.id) || false,
+      clan: post.clan ? (Array.isArray(post.clan) ? post.clan[0] : post.clan) : null,
+      isAuthor: user?.id === post.user_id,
+      poll,
+      previewComments
+    };
+  });
+
+  return (
+    <>
+      {postsError && (
+        <div className="bg-red-500/20 text-red-500 border border-red-500/30 rounded-xl p-4 mb-6">
+          <strong>Database Error:</strong> {postsError.message} ({postsError.code})
+        </div>
+      )}
+      
+      <div className="hidden lg:block">
+        <CommunityComposer userAvatar={userAvatar} />
+      </div>
+      
+      {posts.length === 0 && (
+        <div className="bg-[#111] border border-white/10 rounded-2xl p-12 text-center my-6 flex flex-col gap-3">
+          <p className="text-white/60 text-base font-medium">No posts are showing in the feed yet.</p>
+          <p className="text-white/40 text-sm">Be the first to start a conversation!</p>
+        </div>
+      )}
+      
+      <div className="flex flex-col gap-0 border-t border-white/10 pt-2">
+        {posts.map((post) => (
+          <FeedCard key={post.id} {...post} />
+        ))}
+      </div>
+
+      {posts.length >= limit && (
+        <div className="flex justify-center mt-6">
+          <Link 
+            href={`/Community?${new URLSearchParams({ ...(filter ? { filter } : {}), limit: (limit + 10).toString() })}`}
+            scroll={false}
+            className="flex items-center gap-2 text-[#888] hover:text-white transition-colors py-2 px-4 rounded-full bg-white/5"
+          >
+            <Repeat2 className="w-4 h-4" />
+            <span className="text-sm font-medium">Load More Posts</span>
+          </Link>
+        </div>
+      )}
+
+      {/* Mobile Floating Action Button */}
+      <MobileComposerFAB userAvatar={userAvatar} />
+    </>
   );
 }

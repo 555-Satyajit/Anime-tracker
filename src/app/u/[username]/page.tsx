@@ -106,13 +106,13 @@ export default async function PublicProfilePage({
             <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
           </div>
           
-          <div className="absolute bottom-6 left-6 md:left-12 flex items-end gap-6">
-            <div className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-background overflow-hidden bg-muted relative">
+          <div className="absolute bottom-6 left-6 md:left-12 flex items-end gap-4 md:gap-6 w-[calc(100%-3rem)] md:w-[calc(100%-6rem)]">
+            <div className="w-24 h-24 md:w-32 md:h-32 shrink-0 rounded-full border-4 border-background overflow-hidden bg-muted relative">
               <img src={avatarUrl} alt={displayName} className="w-full h-full object-cover" />
             </div>
-            <div className="mb-2">
-              <h1 className="text-2xl md:text-4xl font-black text-white drop-shadow-md">{displayName}</h1>
-              <p className="text-muted-foreground font-medium text-sm md:text-base drop-shadow-md">@{profile.username}</p>
+            <div className="mb-2 min-w-0 flex-1 pr-4">
+              <h1 className="text-2xl md:text-4xl font-black text-white drop-shadow-md truncate">{displayName}</h1>
+              <p className="text-muted-foreground font-medium text-sm md:text-base drop-shadow-md truncate">@{profile.username}</p>
             </div>
           </div>
         </div>
@@ -125,18 +125,18 @@ export default async function PublicProfilePage({
               {profile.bio || `No bio provided yet. Welcome to ${displayName}'s anime tracker.`}
             </p>
           </div>
-          <div className="flex gap-4 shrink-0">
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4 min-w-[120px] text-center">
-              <div className="text-3xl font-black text-white">{stats.watching}</div>
-              <div className="text-xs text-muted-foreground font-medium uppercase tracking-wider mt-1">Watching</div>
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 shrink-0 mt-6 md:mt-0 w-full md:w-auto">
+            <div className="bg-white/5 border border-white/10 rounded-xl p-3 sm:p-4 text-center">
+              <div className="text-2xl sm:text-3xl font-black text-white">{stats.watching}</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground font-medium uppercase tracking-wider mt-1 break-words">Watching</div>
             </div>
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4 min-w-[120px] text-center">
-              <div className="text-3xl font-black text-[#10b981]">{stats.watched}</div>
-              <div className="text-xs text-muted-foreground font-medium uppercase tracking-wider mt-1">Completed</div>
+            <div className="bg-white/5 border border-white/10 rounded-xl p-3 sm:p-4 text-center">
+              <div className="text-2xl sm:text-3xl font-black text-[#10b981]">{stats.watched}</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground font-medium uppercase tracking-wider mt-1 break-words">Completed</div>
             </div>
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4 min-w-[120px] text-center">
-              <div className="text-3xl font-black text-purple-400">{stats.planToWatch}</div>
-              <div className="text-xs text-muted-foreground font-medium uppercase tracking-wider mt-1">Plan to Watch</div>
+            <div className="bg-white/5 border border-white/10 rounded-xl p-3 sm:p-4 text-center">
+              <div className="text-2xl sm:text-3xl font-black text-purple-400">{stats.planToWatch}</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground font-medium uppercase tracking-wider mt-1 break-words flex flex-col"><span>Plan To</span><span>Watch</span></div>
             </div>
           </div>
         </div>
