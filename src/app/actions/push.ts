@@ -136,3 +136,48 @@ export async function sendSystemPush(supabaseAdmin: any, userId: string, payload
   await Promise.allSettled(sendPromises);
   return { success: true };
 }
+
+export async function broadcastWebPushAction(title: string, message: string) {
+  const adminClient = await import("@/utils/supabase/admin").then(m => m.createAdminClient());
+
+  const { data: subscriptions, error } = await adminClient
+    .from('push_subscriptions')
+    .select('*');
+
+  if (error || !subscriptions || subscriptions.length === 0) {
+    return { success: false, error: "No subscriptions found or error fetching them." };
+  }
+
+  const notificationPayload = JSON.stringify({
+    title,
+    body: message,
+    url: '/account/notifications',
+    icon: '/favicon.png'
+  });
+
+  const sendPromises = subscriptions.map(async (sub: any) => {
+    const pushSubscription = {
+      endpoint: sub.endpoint,
+      keys: {
+        p256dh: sub.p256dh,
+        auth: sub.auth
+      }
+    };
+
+    try {
+      await webpush.sendNotification(pushSubscription, notificationPayload);
+    } catch (err: any) {
+      if (err.statusCode === 410 || err.statusCode === 404) {
+        // Subscription has expired or is no longer valid, delete it
+        await adminClient
+          .from('push_subscriptions')
+          .delete()
+          .eq('id', sub.id);
+      }
+    }
+  });
+
+  await Promise.allSettled(sendPromises);
+  
+  return { success: true, message: `Successfully broadcasted push notification to ${subscriptions.length} devices!` };
+}

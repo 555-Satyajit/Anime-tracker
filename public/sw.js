@@ -39,3 +39,18 @@ self.addEventListener('notificationclick', function(event) {
     })
   );
 });
+
+// Required for PWA Installability
+self.addEventListener('fetch', function(event) {
+  // A simple pass-through fetch handler that fulfills the PWA requirement
+  // without interfering with Next.js App Router's built-in caching.
+  event.respondWith(
+    fetch(event.request).catch(function() {
+      return new Response("You are currently offline.", {
+        status: 503,
+        statusText: "Service Unavailable",
+        headers: new Headers({ "Content-Type": "text/plain" })
+      });
+    })
+  );
+});
