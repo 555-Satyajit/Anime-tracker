@@ -11,10 +11,21 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: '#e71014',
     icons: [
       {
-        src: '/favicon.png',
-        sizes: 'any',
+        src: '/favicon_io/android-chrome-192x192.png',
+        sizes: '192x192',
         type: 'image/png',
       },
+      {
+        src: '/favicon_io/android-chrome-512x512.png',
+        sizes: '512x512',
+        type: 'image/png',
+      },
+      {
+        src: '/favicon_io/android-chrome-512x512.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'maskable'
+      }
     ],
   };
 }
