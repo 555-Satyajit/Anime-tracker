@@ -44,7 +44,7 @@ export function NewsHero() {
         </p>
 
         {/* Category Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-4 scrollbar-none w-[100vw] lg:w-auto -mx-4 px-4 lg:mx-0 lg:px-0">
+        <div className="flex items-center gap-2 overflow-x-auto pb-4 scrollbar-none -mx-4 px-4 sm:-mx-8 sm:px-8 lg:mx-0 lg:px-0">
           {CATEGORIES.map((category, idx) => (
             <Button
               key={idx}

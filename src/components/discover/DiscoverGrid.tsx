@@ -3,10 +3,10 @@
 import React, { useState } from "react";
 import { PlayCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { AnimeModal } from "@/components/home/AnimeModal";
+import Link from "next/link";
+import { getAnimeSlug } from "@/lib/anilist";
 
 export function DiscoverGrid({ initialAnime }: { initialAnime: any[] }) {
-  const [selectedAnime, setSelectedAnime] = useState<any>(null);
 
   const getTagAndColor = (anime: any) => {
     if (anime.status === "RELEASING") {
@@ -31,10 +31,10 @@ export function DiscoverGrid({ initialAnime }: { initialAnime: any[] }) {
         {initialAnime.map((anime) => {
           const { tag, hasIcon, colorClass, epText } = getTagAndColor(anime);
           return (
-            <div 
+            <Link 
+              href={`/anime/${getAnimeSlug(anime)}`}
               key={anime.id} 
-              onClick={() => setSelectedAnime(anime)} 
-              className="group cursor-pointer rounded-2xl overflow-hidden bg-[#0f0f0f] border border-white/5 hover:border-white/20 transition-all relative flex flex-col h-full"
+              className="group cursor-pointer rounded-2xl overflow-hidden bg-[#0f0f0f] border border-white/5 hover:border-white/20 transition-all relative flex flex-col h-full block"
             >
               <div className="aspect-[2/3] relative overflow-hidden shrink-0">
                 <img 
@@ -60,16 +60,11 @@ export function DiscoverGrid({ initialAnime }: { initialAnime: any[] }) {
                   </Badge>
                 </div>
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>
 
-      <AnimeModal 
-        anime={selectedAnime} 
-        isOpen={!!selectedAnime} 
-        onClose={() => setSelectedAnime(null)} 
-      />
     </>
   );
 }

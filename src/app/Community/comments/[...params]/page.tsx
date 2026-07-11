@@ -28,6 +28,55 @@ function formatTimeAgo(dateString: string) {
 
 export const dynamic = "force-dynamic";
 
+export async function generateMetadata({ params }: { params: Promise<{ params: string[] }> }) {
+  const resolvedParams = await params;
+  const routeParams = resolvedParams.params;
+  
+  if (!routeParams || routeParams.length === 0) {
+    return { title: 'Post Not Found - SENKAI' };
+  }
+
+  const id = routeParams[0];
+  const supabase = await createClient();
+  const { data: post } = await supabase
+    .from("community_posts")
+    .select("title, content")
+    .eq("id", id)
+    .single();
+
+  if (!post) {
+    return { title: 'Post Not Found - SENKAI' };
+  }
+
+  // Extract a short description from the content for the meta description
+  const cleanContent = post.content ? post.content.replace(/<[^>]*>?/gm, '').trim() : '';
+  const description = cleanContent.length > 150 
+    ? `${cleanContent.substring(0, 147)}...` 
+    : (cleanContent || 'Join the discussion on SENKAI community.');
+
+  const postSlug = slugify(post.content || "discussion");
+  const url = `https://www.senkaihub.com/Community/comments/${id}/${postSlug}`;
+
+  return {
+    title: `${post.title} | SENKAI Community`,
+    description: description,
+    alternates: {
+      canonical: url,
+    },
+    openGraph: {
+      title: `${post.title} | SENKAI`,
+      description: description,
+      url: url,
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary',
+      title: `${post.title} | SENKAI`,
+      description: description,
+    }
+  };
+}
+
 // Helper to slugify content for URLs
 function slugify(text: string) {
   return text

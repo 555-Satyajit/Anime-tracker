@@ -3,6 +3,7 @@
 import React, { useState, useTransition } from "react";
 import { Heart, MessageSquare, Bookmark, MoreHorizontal, CheckCircle2, EyeOff, Send, Loader2, Edit, Trash2, Shield, AlertCircle, Share2 } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { toggleLike, toggleBookmark, votePoll, addComment, getComments, deletePost, editPost } from "@/app/actions/community";
 import { useRouter } from "next/navigation";
@@ -159,7 +160,7 @@ export function FeedCard({
       if (res?.error) {
         setIsLiked(isLiked);
         setLikes(likes);
-        alert(res.error);
+        toast.error(res.error);
       }
     });
   };
@@ -169,7 +170,7 @@ export function FeedCard({
     startTransition(async () => {
       const res = await editPost(id, editContent);
       if (res?.error) {
-        alert(res.error);
+        toast.error(res.error);
       } else {
         setCurrentContent(editContent);
         setIsEditing(false);
@@ -186,7 +187,7 @@ export function FeedCard({
     startTransition(async () => {
       const res = await deletePost(id);
       if (res?.error) {
-        alert(res.error);
+        toast.error(res.error);
       } else {
         setIsDeleteModalOpen(false);
         if (isDetailView) {
@@ -204,7 +205,7 @@ export function FeedCard({
       const res = await toggleBookmark(id, isBookmarked);
       if (res?.error) {
         setIsBookmarked(isBookmarked);
-        alert(res.error);
+        toast.error(res.error);
       }
     });
   };
@@ -226,7 +227,7 @@ export function FeedCard({
       if (res?.error) {
         setVotedOptionId(null);
         setPollOptions(poll.options);
-        alert(res.error);
+        toast.error(res.error);
       }
     });
   };

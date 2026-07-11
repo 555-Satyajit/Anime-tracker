@@ -5,10 +5,9 @@ import Link from "next/link";
 import { Bell, Calendar, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { AnimeModal } from "./AnimeModal";
+import { getAnimeSlug } from "@/lib/anilist";
 
 export function UpcomingEpisodes({ episodes }: { episodes?: any[] }) {
-  const [selectedAnime, setSelectedAnime] = useState<any>(null);
   const [mounted, setMounted] = useState(false);
 
   React.useEffect(() => {
@@ -51,7 +50,7 @@ export function UpcomingEpisodes({ episodes }: { episodes?: any[] }) {
             {episodes?.map((ep, i) => {
               const { date, month, time } = formatAiringTime(ep.airingAt);
               return (
-                <div key={ep.id} onClick={() => setSelectedAnime(ep.media)} className="flex items-center gap-3 py-2.5 first:pt-0 last:pb-0 group cursor-pointer">
+                <Link href={`/anime/${getAnimeSlug(ep.media)}`} key={ep.id} className="flex items-center gap-3 py-2.5 first:pt-0 last:pb-0 group cursor-pointer block">
                   <div className="flex flex-col items-center justify-center min-w-[32px]">
                     <span className="text-[8px] text-[#888] font-bold uppercase">{month}</span>
                     <span className="text-sm font-black text-white leading-none">{date}</span>
@@ -66,7 +65,7 @@ export function UpcomingEpisodes({ episodes }: { episodes?: any[] }) {
                     <span className="text-[9px] font-bold text-[#e71014]">{time}</span>
                     <Bell className="w-3 h-3 text-[#888] cursor-pointer hover:text-white transition-colors" onClick={(e) => e.stopPropagation()} />
                   </div>
-                </div>
+                </Link>
               )
             })}
           </div>
@@ -78,11 +77,6 @@ export function UpcomingEpisodes({ episodes }: { episodes?: any[] }) {
         </CardContent>
       </Card>
 
-      <AnimeModal 
-        anime={selectedAnime} 
-        isOpen={!!selectedAnime} 
-        onClose={() => setSelectedAnime(null)} 
-      />
     </>
   );
 }

@@ -8,6 +8,8 @@ import { savePushSubscription } from "@/app/actions/push";
 import { toast } from "sonner";
 import { createClient } from "@/utils/supabase/client";
 
+import { usePathname, useSearchParams } from "next/navigation";
+
 // Utility to convert VAPID public key
 function urlBase64ToUint8Array(base64String: string) {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -24,6 +26,9 @@ export function PushNotificationModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isIOSStandalone, setIsIOSStandalone] = useState(true);
+  
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     // Check if we should show the modal
@@ -54,6 +59,14 @@ export function PushNotificationModal() {
         setIsIOSStandalone(isStandalone);
       }
 
+      // Block modal during tutorial/onboarding to prevent users from getting stuck
+      if (
+        window.location.search.includes("tutorial=true") || 
+        window.location.pathname.toLowerCase().includes("onboarding")
+      ) {
+        return;
+      }
+
       // Wait 3 seconds after page load so it's not too aggressive
       setTimeout(() => {
         setIsOpen(true);
@@ -61,7 +74,7 @@ export function PushNotificationModal() {
     };
 
     checkStatus();
-  }, []);
+  }, [pathname, searchParams]);
 
   const handleDismiss = () => {
     localStorage.setItem("pushPromptDismissed", "true");

@@ -119,6 +119,10 @@ export default async function ClanDetailPage({ params, searchParams }: { params:
   let clanMembersCount = 0;
   let clanMembersPreview: string[] = [];
   
+  let likedPostIds = new Set<string>();
+  let bookmarkedPostIds = new Set<string>();
+
+  
   if (canViewFeed) {
     const fetchPromises: any[] = [
       supabase
@@ -145,13 +149,7 @@ export default async function ClanDetailPage({ params, searchParams }: { params:
         .eq("clan_id", clanId)
     ];
 
-    if (user) {
-      fetchPromises.push(
-        supabase.from("poll_votes").select("poll_id, option_id").eq("user_id", user.id)
-      );
-    }
-
-    const [postsRes, membersRes, votesRes] = await Promise.all(fetchPromises);
+    const [postsRes, membersRes] = await Promise.all(fetchPromises);
     
     posts = postsRes.data || [];
     
@@ -166,10 +164,28 @@ export default async function ClanDetailPage({ params, searchParams }: { params:
       });
     }
 
-    if (votesRes?.data) {
-      votesRes.data.forEach((v: any) => {
-        votedPollOptionIds.set(v.poll_id, v.option_id);
-      });
+    if (user && posts && posts.length > 0) {
+      const postIds = posts.map((p: any) => p.id);
+      const pollIds = posts.flatMap((p: any) => 
+        p.polls ? (Array.isArray(p.polls) ? p.polls : [p.polls]).map((poll: any) => poll.id) : []
+      );
+
+      const [likesRes, bookmarksRes, votesRes] = await Promise.all([
+        supabase.from("post_likes").select("post_id").eq("user_id", user.id).in("post_id", postIds),
+        supabase.from("post_bookmarks").select("post_id").eq("user_id", user.id).in("post_id", postIds),
+        pollIds.length > 0
+          ? supabase.from("poll_votes").select("poll_id, option_id").eq("user_id", user.id).in("poll_id", pollIds)
+          : Promise.resolve({ data: [], error: null })
+      ]);
+
+      if (likesRes.data) likedPostIds = new Set(likesRes.data.map((l: any) => l.post_id));
+      if (bookmarksRes.data) bookmarkedPostIds = new Set(bookmarksRes.data.map((b: any) => b.post_id));
+      
+      if (votesRes?.data) {
+        votesRes.data.forEach((v: any) => {
+          votedPollOptionIds.set(v.poll_id, v.option_id);
+        });
+      }
     }
   }
 
@@ -355,6 +371,8 @@ export default async function ClanDetailPage({ params, searchParams }: { params:
                         canDelete={isLeader}
                         clanMembersCount={clanMembersCount}
                         clanMembersPreview={clanMembersPreview}
+                        isLikedInitially={likedPostIds.has(post.id)}
+                        isBookmarkedInitially={bookmarkedPostIds.has(post.id)}
                       />
                     );
                   })

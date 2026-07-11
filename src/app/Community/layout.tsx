@@ -7,7 +7,7 @@ export default function CommunityLayout({ children }: { children: ReactNode }) {
       <Navbar />
       
       <main className="flex-1 w-full flex flex-col pt-20 md:pt-24">
-        <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-[140px] lg:pb-8">
           {/* Render the specific page content (Feed, Clans, Members, etc.) */}
           {children}
         </div>

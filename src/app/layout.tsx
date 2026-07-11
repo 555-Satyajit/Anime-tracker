@@ -41,7 +41,9 @@ export const metadata: Metadata = {
   }
 };
 
+import { Suspense } from "react";
 import { Toaster } from "@/components/ui/sonner";
+import NextTopLoader from 'nextjs-toploader';
 
 export default function RootLayout({
   children,
@@ -53,11 +55,24 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
     >
-      <body className="min-h-full flex flex-col bg-background text-foreground overflow-x-hidden">
+      <body className="min-h-full flex flex-col bg-background text-foreground overflow-x-hidden pb-20 lg:pb-0">
+        <NextTopLoader 
+          color="#e71014"
+          initialPosition={0.08}
+          crawlSpeed={200}
+          height={3}
+          crawl={true}
+          showSpinner={false}
+          easing="ease"
+          speed={200}
+          shadow="0 0 10px #e71014,0 0 5px #e71014"
+        />
         <SplashScreen />
         {children}
         <Toaster position="top-center" />
-        <PushNotificationModal />
+        <Suspense fallback={null}>
+          <PushNotificationModal />
+        </Suspense>
         <MobileBottomNav />
         <Analytics />
       </body>

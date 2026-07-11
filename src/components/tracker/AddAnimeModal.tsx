@@ -79,7 +79,7 @@ export function AddAnimeModal() {
       const result = await addAnimeToTracker(selectedAnime, status, episodesWatched, score);
       
       if (result.error) {
-        alert(result.error);
+        toast.error(result.error);
         return;
       }
       
@@ -92,7 +92,7 @@ export function AddAnimeModal() {
       
     } catch (error) {
       console.error(error);
-      alert("Failed to save anime. Please try again.");
+      toast.error("Failed to save anime. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -153,10 +153,10 @@ export function AddAnimeModal() {
                   <img 
                     src={anime.coverImage?.large} 
                     alt={anime.title.romaji} 
-                    className="w-12 h-16 object-cover rounded shadow-sm"
+                    className="w-12 h-16 object-cover rounded shadow-sm shrink-0"
                   />
-                  <div className="flex flex-col overflow-hidden">
-                    <span className="font-bold text-sm truncate">{anime.title.english || anime.title.romaji}</span>
+                  <div className="flex flex-col flex-1 min-w-0">
+                    <span className="font-bold text-sm line-clamp-2">{anime.title.english || anime.title.romaji}</span>
                     <span className="text-xs text-muted-foreground truncate">{anime.format} • {anime.episodes || '?'} Episodes</span>
                   </div>
                 </div>

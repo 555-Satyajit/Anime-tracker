@@ -1,19 +1,18 @@
 "use client";
 
-import React, { useState } from "react";
-import { AnimeModal } from "@/components/home/AnimeModal";
+import Link from "next/link";
+import { getAnimeSlug } from "@/lib/anilist";
 
 export function CurrentSeasonGrid({ animeList }: { animeList: any[] }) {
-  const [selectedAnime, setSelectedAnime] = useState<any>(null);
 
   return (
     <>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {animeList.map((show: any) => (
-          <div 
+          <Link 
+            href={`/anime/${getAnimeSlug(show)}`}
             key={show.id} 
-            className="relative aspect-[16/10] rounded-lg overflow-hidden group cursor-pointer border border-border/50"
-            onClick={() => setSelectedAnime(show)}
+            className="relative aspect-[16/10] rounded-lg overflow-hidden group cursor-pointer border border-border/50 block"
           >
             <img 
               src={show.coverImage.extraLarge || show.coverImage.large} 
@@ -25,15 +24,11 @@ export function CurrentSeasonGrid({ animeList }: { animeList: any[] }) {
               <h3 className="font-bold text-sm text-white truncate mb-0.5">{show.title.english || show.title.romaji}</h3>
               <p className="text-[11px] text-zinc-300">{show.episodes ? `${show.episodes} Episodes` : 'Airing'}</p>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 
-      <AnimeModal 
-        anime={selectedAnime} 
-        isOpen={!!selectedAnime} 
-        onClose={() => setSelectedAnime(null)} 
-      />
+
     </>
   );
 }

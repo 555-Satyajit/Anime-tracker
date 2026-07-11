@@ -5,8 +5,8 @@ import { Star, BookmarkPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { AnimeModal } from "@/components/home/AnimeModal";
 import { TrackAnimeButton } from "@/components/rankings/TrackAnimeButton";
+import { getAnimeSlug } from "@/lib/anilist";
 
 interface RankingsListProps {
   animeList?: any[];
@@ -16,7 +16,6 @@ interface RankingsListProps {
 
 export function RankingsList({ animeList = [], currentPage = 1, category = 'top-anime' }: RankingsListProps) {
   const router = useRouter();
-  const [selectedAnime, setSelectedAnime] = useState<any>(null);
 
   const handlePageChange = (newPage: number) => {
     if (newPage < 1) return;
@@ -78,13 +77,8 @@ export function RankingsList({ animeList = [], currentPage = 1, category = 'top-
             rating = item.averageScore ? (item.averageScore / 10).toFixed(2) : "N/A";
           }
 
-          return (
-            <div 
-              key={item.id} 
-              className="group flex items-center py-4 border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors -mx-4 px-4 rounded-xl cursor-pointer"
-              onClick={() => { if (!isNotAnime) setSelectedAnime(item); }}
-            >
-              
+          const content = (
+            <>
               {/* Rank */}
               <div className={`w-12 text-center text-2xl sm:text-3xl font-black shrink-0 ${
                 rank <= 3 ? "text-transparent bg-clip-text bg-gradient-to-b from-yellow-400 to-yellow-600" : "text-muted-foreground/30"
@@ -127,8 +121,28 @@ export function RankingsList({ animeList = [], currentPage = 1, category = 'top-
                   <TrackAnimeButton anime={item} />
                 </div>
               )}
-              
-            </div>
+            </>
+          );
+
+          if (isNotAnime) {
+            return (
+              <div 
+                key={item.id} 
+                className="group flex items-center py-4 border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors -mx-4 px-4 rounded-xl cursor-pointer block"
+              >
+                {content}
+              </div>
+            );
+          }
+
+          return (
+            <Link 
+              key={item.id} 
+              href={`/anime/${getAnimeSlug(item)}`}
+              className="group flex items-center py-4 border-b border-border/50 last:border-0 hover:bg-secondary/20 transition-colors -mx-4 px-4 rounded-xl cursor-pointer block"
+            >
+              {content}
+            </Link>
           );
         })}
         {animeList.length === 0 && (
@@ -181,11 +195,7 @@ export function RankingsList({ animeList = [], currentPage = 1, category = 'top-
         </Button>
       </div>
 
-      <AnimeModal 
-        anime={selectedAnime} 
-        isOpen={!!selectedAnime} 
-        onClose={() => setSelectedAnime(null)} 
-      />
+
     </div>
   );
 }

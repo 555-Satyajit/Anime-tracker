@@ -110,7 +110,18 @@ export async function toggleLike(postId: string, currentLikedState: boolean) {
       .from("post_likes")
       .insert({ post_id: postId, user_id: user.id });
       
-    if (error) return { error: error.message };
+    if (error) {
+      if (error.code === '23505') {
+        // Unique violation (already liked)
+        // This happens if the UI was out of sync and the user clicked like again
+        return { success: true };
+      }
+      if (error.code === '23503') {
+        // Foreign key violation
+        return { error: "Action failed. You may need to log out and log back in to finish setting up your profile." };
+      }
+      return { error: error.message };
+    }
   }
 
   revalidatePath("/Community", "layout");

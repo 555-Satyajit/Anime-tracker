@@ -6,10 +6,9 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Trophy, Star, ArrowUpRight } from "lucide-react";
-import { AnimeModal } from "./AnimeModal";
+import { getAnimeSlug } from "@/lib/anilist";
 
 export function TopRankings({ anime = [], movies = [], characters = [] }: { anime?: any[], movies?: any[], characters?: any[] }) {
-  const [selectedAnime, setSelectedAnime] = useState<any>(null);
 
   const renderList = (list: any[], isCharacter = false) => (
     <div className="flex flex-col gap-4 max-h-[350px] overflow-y-auto pr-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-white/20 transition-colors">
@@ -18,8 +17,8 @@ export function TopRankings({ anime = [], movies = [], characters = [] }: { anim
         const score = isCharacter ? `${(item.favourites / 1000).toFixed(1)}k Faves` : `${item.averageScore}% Score`;
         const img = isCharacter ? item.image?.large : item.coverImage?.large;
 
-        return (
-          <div key={item.id} onClick={() => !isCharacter && setSelectedAnime(item)} className={`flex items-center gap-4 group ${!isCharacter ? "cursor-pointer" : ""}`}>
+        const content = (
+          <>
             <div className={`w-6 text-center font-black ${i === 0 ? "text-[#e71014] text-lg drop-shadow-[0_0_10px_rgba(231,16,20,0.5)]" : i === 1 ? "text-slate-300 text-lg" : i === 2 ? "text-amber-700 text-lg" : "text-[#555] text-sm"}`}>
               {i + 1}
             </div>
@@ -36,7 +35,21 @@ export function TopRankings({ anime = [], movies = [], characters = [] }: { anim
               <span className="text-[11px] font-bold text-[#888] group-hover:text-white transition-colors">{score}</span>
               {!isCharacter && <Star className="w-3.5 h-3.5 text-[#e71014]" />}
             </div>
-          </div>
+          </>
+        );
+
+        if (isCharacter) {
+          return (
+            <div key={item.id} className="flex items-center gap-4 group">
+              {content}
+            </div>
+          );
+        }
+
+        return (
+          <Link key={item.id} href={`/anime/${getAnimeSlug(item)}`} className="flex items-center gap-4 group cursor-pointer block">
+            {content}
+          </Link>
         );
       })}
     </div>
@@ -73,11 +86,6 @@ export function TopRankings({ anime = [], movies = [], characters = [] }: { anim
         </CardContent>
       </Card>
 
-      <AnimeModal 
-        anime={selectedAnime} 
-        isOpen={!!selectedAnime} 
-        onClose={() => setSelectedAnime(null)} 
-      />
     </>
   );
 }

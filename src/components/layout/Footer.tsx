@@ -12,7 +12,7 @@ export function Footer() {
   };
 
   return (
-    <footer className="w-full bg-[#050505] border-t border-white/5 pt-12 pb-8 relative z-10">
+    <footer className="hidden md:block w-full bg-[#050505] border-t border-white/5 pt-12 pb-8 relative z-10">
       <div className="max-w-[1600px] px-8 lg:px-16 mx-auto flex flex-col gap-16">
         
         <NewsletterBanner />

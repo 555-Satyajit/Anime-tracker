@@ -46,13 +46,18 @@ export default function GlobalError({
 
           <div className="space-y-3">
             <h1 className="text-3xl sm:text-4xl font-black tracking-wider">
-              DATABASE <span className="text-[#e71014]">OFFLINE</span>
+              SYSTEM <span className="text-[#e71014]">ERROR</span>
             </h1>
-            <p className="text-[#888] text-sm sm:text-base leading-relaxed">
-              Our upstream anime provider (AniList) is currently experiencing unexpected downtime due to heavy server load. 
-              <br /><br />
-              Don't worry, <strong>your personal tracking data is 100% safe</strong>. We just can't fetch the anime cover images and titles right now.
+            <p className="text-[#888] text-sm max-w-md mx-auto leading-relaxed">
+              We encountered an unexpected error while loading this page. Our team has been notified.
             </p>
+            {error.message && (
+              <div className="mt-4 p-3 bg-red-950/30 border border-red-900/50 rounded-lg max-w-md mx-auto">
+                <p className="text-red-400/80 text-xs font-mono break-words">
+                  {error.message}
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col w-full gap-4 pt-4">

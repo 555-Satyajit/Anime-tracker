@@ -1,5 +1,21 @@
 export const ANILIST_API_URL = "https://graphql.anilist.co";
 
+export function getAnimeSlug(anime: any): string {
+  if (!anime) return "anime";
+  const id = anime.id;
+  const title = anime.title?.english || anime.title?.romaji || "";
+  const slug = title
+    .toString()
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w\-]+/g, "")
+    .replace(/\-\-+/g, "-")
+    .replace(/^-+/, "")
+    .replace(/-+$/, "")
+    .slice(0, 50) || "anime";
+  return `${id}-${slug}`;
+}
+
 export async function fetchAniList(query: string, variables: any = {}) {
   const response = await fetch(ANILIST_API_URL, {
     method: "POST",
@@ -415,4 +431,79 @@ export async function getDiscoverAnime(filters: {
   if (json.errors) throw new Error("Failed to search AniList");
   
   return json.data.Page;
+}
+
+export async function getAnimeDetails(id: number) {
+  const query = `
+    query GetAnimeDetails($id: Int) {
+      Media(id: $id, type: ANIME) {
+        id
+        title { romaji english native }
+        coverImage { extraLarge large color }
+        bannerImage
+        description(asHtml: true)
+        genres
+        format
+        status
+        episodes
+        duration
+        averageScore
+        season
+        seasonYear
+        nextAiringEpisode {
+          airingAt
+          episode
+          timeUntilAiring
+        }
+        trailer {
+          id
+          site
+        }
+        studios(isMain: true) {
+          nodes {
+            name
+          }
+        }
+        characters(sort: ROLE, perPage: 10) {
+          edges {
+            role
+            node {
+              id
+              name { full }
+              image { large }
+            }
+            voiceActors(language: JAPANESE) {
+              id
+              name { full }
+              image { large }
+            }
+          }
+        }
+        staff(sort: RELEVANCE, perPage: 8) {
+          edges {
+            role
+            node {
+              id
+              name { full }
+            }
+          }
+        }
+        recommendations(sort: RATING_DESC, perPage: 6) {
+          edges {
+            node {
+              mediaRecommendation {
+                id
+                title { romaji english }
+                coverImage { large }
+                format
+                status
+              }
+            }
+          }
+        }
+      }
+    }
+  `;
+  const data = await fetchAniList(query, { id });
+  return data.Media;
 }

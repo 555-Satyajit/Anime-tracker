@@ -4,7 +4,7 @@ import React, { useRef } from "react";
 import Link from "next/link";
 import { ArrowUpRight, PlayCircle, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { AnimeModal } from "./AnimeModal";
+import { getAnimeSlug } from "@/lib/anilist";
 
 export function TrendingCarousel({ animeList }: { animeList?: any[] }) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -14,8 +14,6 @@ export function TrendingCarousel({ animeList }: { animeList?: any[] }) {
       scrollContainerRef.current.scrollBy({ left: 320, behavior: "smooth" });
     }
   };
-
-  const [selectedAnime, setSelectedAnime] = React.useState<any>(null);
 
   const getTagAndColor = (anime: any) => {
     if (anime.status === "RELEASING") {
@@ -74,7 +72,7 @@ export function TrendingCarousel({ animeList }: { animeList?: any[] }) {
           {animeList?.map((anime, i) => {
             const { tag, hasIcon, colorClass, epText } = getTagAndColor(anime);
             return (
-            <div key={anime.id} onClick={() => setSelectedAnime(anime)} className="shrink-0 snap-start group cursor-pointer rounded-2xl overflow-hidden bg-[#0f0f0f] border border-white/5 hover:border-white/20 transition-all relative w-[140px] md:w-[calc((100%-48px)/4)] lg:w-[calc((100%-80px)/6)]">
+            <Link href={`/anime/${getAnimeSlug(anime)}`} key={anime.id} className="shrink-0 snap-start group cursor-pointer rounded-2xl overflow-hidden bg-[#0f0f0f] border border-white/5 hover:border-white/20 transition-all relative w-[140px] md:w-[calc((100%-48px)/4)] lg:w-[calc((100%-80px)/6)] block">
             <div className="aspect-[2/3] relative overflow-hidden">
               <img src={anime.coverImage.extraLarge || anime.coverImage.large} alt={anime.title.english || anime.title.romaji} className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500" />
               {/* Darker overlay to make text highly visible */}
@@ -87,7 +85,7 @@ export function TrendingCarousel({ animeList }: { animeList?: any[] }) {
                 {hasIcon && <PlayCircle className="w-3 h-3" />} {tag}
               </Badge>
             </div>
-          </div>
+          </Link>
           )})}
         </div>
 
@@ -99,12 +97,6 @@ export function TrendingCarousel({ animeList }: { animeList?: any[] }) {
           <ChevronRight className="w-5 h-5 ml-0.5" />
         </button>
       </div>
-
-      <AnimeModal 
-        anime={selectedAnime} 
-        isOpen={!!selectedAnime} 
-        onClose={() => setSelectedAnime(null)} 
-      />
     </section>
   );
 }
