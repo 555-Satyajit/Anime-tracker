@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { createPost } from "@/app/actions/community";
 import { Loader2 } from "lucide-react";
+import { createClient } from "@/utils/supabase/client";
 
 export function CommunityComposer({ userAvatar, clanId, isSpoilerVaultEnabled }: { userAvatar?: string, clanId?: string, isSpoilerVaultEnabled?: boolean }) {
   const [content, setContent] = useState("");
@@ -17,8 +18,53 @@ export function CommunityComposer({ userAvatar, clanId, isSpoilerVaultEnabled }:
   const [pollDays, setPollDays] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [discussionTag, setDiscussionTag] = useState("General");
+  
+  const [mentionQuery, setMentionQuery] = useState<string | null>(null);
+  const [mentionResults, setMentionResults] = useState<any[]>([]);
+  const [cursorPosition, setCursorPosition] = useState(0);
 
   const DISCUSSION_TAGS = ["General", "Theory", "Question", "Review", "Recommendation", "Manga Spoilers", "News", "Suggestions", "Fan Art", "Help", "Discussion", "Anime Talk"];
+
+  const handleContentChange = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const val = e.target.value;
+    setContent(val);
+    const cursor = e.target.selectionStart;
+    setCursorPosition(cursor);
+    
+    const textBeforeCursor = val.slice(0, cursor);
+    const mentionMatch = textBeforeCursor.match(/@([a-zA-Z0-9_]*)$/);
+    
+    if (mentionMatch) {
+      const query = mentionMatch[1];
+      setMentionQuery(query);
+      
+      if (query.length > 0) {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('user_profiles')
+          .select('username, avatar_url')
+          .ilike('username', `${query}%`)
+          .limit(5);
+          
+        setMentionResults(data || []);
+      } else {
+        setMentionResults([]);
+      }
+    } else {
+      setMentionQuery(null);
+    }
+  };
+
+  const handleSelectMention = (username: string) => {
+    if (mentionQuery === null) return;
+    const textBeforeCursor = content.slice(0, cursorPosition);
+    const textAfterCursor = content.slice(cursorPosition);
+    
+    const textBeforeMention = textBeforeCursor.replace(/@[a-zA-Z0-9_]*$/, '');
+    const newContent = `${textBeforeMention}@${username} ${textAfterCursor}`;
+    setContent(newContent);
+    setMentionQuery(null);
+  };
 
   const handleSubmit = async () => {
     if (!content.trim()) return;
@@ -88,12 +134,33 @@ export function CommunityComposer({ userAvatar, clanId, isSpoilerVaultEnabled }:
               className="w-full bg-transparent text-[#e71014] font-black text-lg md:text-xl placeholder:text-[#555] outline-none py-1 mb-2 border-b border-white/10"
             />
           )}
-          <textarea 
-            placeholder={isSpoilerVaultEnabled ? "Kick off the discussion here..." : "What is happening?"}
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="w-full bg-transparent text-white placeholder:text-[#666] resize-none outline-none min-h-[50px] text-[17px] py-1"
-          />
+          <div className="relative w-full">
+            <textarea 
+              placeholder={isSpoilerVaultEnabled ? "Kick off the discussion here..." : "What is happening?"}
+              value={content}
+              onChange={handleContentChange}
+              onKeyUp={(e) => setCursorPosition((e.target as HTMLTextAreaElement).selectionStart)}
+              onClick={(e) => setCursorPosition((e.target as HTMLTextAreaElement).selectionStart)}
+              className="w-full bg-transparent text-white placeholder:text-[#666] resize-none outline-none min-h-[50px] text-[17px] py-1 relative z-10"
+            />
+            {mentionQuery !== null && mentionResults.length > 0 && (
+              <div className="absolute top-full left-0 mt-1 w-64 bg-[#111] border border-white/10 rounded-lg shadow-xl overflow-hidden z-50">
+                {mentionResults.map((u, i) => (
+                  <button 
+                    key={i}
+                    onClick={() => handleSelectMention(u.username)}
+                    className="w-full flex items-center gap-3 p-3 hover:bg-white/10 text-left transition-colors border-b border-white/5 last:border-0"
+                  >
+                    <Avatar className="w-8 h-8">
+                      <AvatarImage src={u.avatar_url || "/avatars/default.png"} />
+                      <AvatarFallback className="bg-[#222] text-xs">U</AvatarFallback>
+                    </Avatar>
+                    <span className="text-white text-sm font-bold">@{u.username}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           
           {/* Poll Builder UI */}
           {showPoll && (

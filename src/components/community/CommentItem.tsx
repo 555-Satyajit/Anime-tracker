@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 // Time ago utility helper
 function formatTimeAgo(dateString: string) {
@@ -65,7 +66,20 @@ export function CommentItem({ comment, currentUserId, postId }: CommentItemProps
   const isAuthor = currentUserId === comment.user_id;
   const replies = comment.replies || [];
 
-
+  const renderContentWithMentions = (text: string) => {
+    if (!text) return null;
+    const parts = text.split(/(@[a-zA-Z0-9_]+)/g);
+    return parts.map((part, i) => {
+      if (part.match(/^@[a-zA-Z0-9_]+$/)) {
+        return (
+          <Link href={`/u/${part.substring(1)}`} key={i} className="text-[#e71014] font-bold hover:underline" onClick={(e) => e.stopPropagation()}>
+            {part}
+          </Link>
+        );
+      }
+      return <React.Fragment key={i}>{part}</React.Fragment>;
+    });
+  };
 
   const handleSaveEdit = () => {
     if (!editContent.trim()) return;
@@ -217,11 +231,11 @@ export function CommentItem({ comment, currentUserId, postId }: CommentItemProps
                     Replying to @{comment.parent.username}
                   </span>
                   <p className="text-[#888] truncate text-[10px]">
-                    {comment.parent.content}
+                    {renderContentWithMentions(comment.parent.content)}
                   </p>
                 </div>
               )}
-              <p className="text-[#bbb] leading-relaxed text-sm whitespace-pre-wrap break-words break-all">{currentContent}</p>
+              <p className="text-[#bbb] leading-relaxed text-sm whitespace-pre-wrap break-words break-all">{renderContentWithMentions(currentContent)}</p>
               {!isEditing && (
                 <div className="flex items-center gap-4 mt-1.5">
                   <button
@@ -245,7 +259,7 @@ export function CommentItem({ comment, currentUserId, postId }: CommentItemProps
                     Replying to @{comment.user?.username || "Anonymous"}
                   </span>
                   <p className="text-[#888] truncate text-[10px]">
-                    {currentContent}
+                    {renderContentWithMentions(currentContent)}
                   </p>
                 </div>
                 <button 

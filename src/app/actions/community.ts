@@ -3,6 +3,47 @@
 import { createClient } from "@/utils/supabase/server";
 import { createAdminClient } from "@/utils/supabase/admin";
 import { revalidatePath } from "next/cache";
+import { notifyUser } from "./notifications";
+
+async function parseAndNotifyMentions(content: string, sourceUserId: string, isComment: boolean) {
+  const mentionRegex = /@([a-zA-Z0-9_]+)/g;
+  const matches = [...content.matchAll(mentionRegex)];
+  if (matches.length === 0) return;
+
+  const uniqueUsernames = [...new Set(matches.map(m => m[1]))];
+
+  const adminClient = createAdminClient();
+  
+  // Get source user username
+  const { data: sourceUser } = await adminClient
+    .from("user_profiles")
+    .select("username")
+    .eq("user_id", sourceUserId)
+    .single();
+    
+  const sourceUsername = sourceUser?.username || "Someone";
+
+  const { data: taggedUsers } = await adminClient
+    .from("user_profiles")
+    .select("user_id, username")
+    .in("username", uniqueUsernames);
+
+  if (!taggedUsers) return;
+
+  const typeName = isComment ? "comment" : "post";
+  
+  for (const u of taggedUsers) {
+    // We allow self-notification so users can test the feature
+    await notifyUser({
+      userId: u.user_id,
+      type: "mention",
+      title: "New Mention",
+      message: `@${sourceUsername} mentioned you in a ${typeName}.`,
+      linkUrl: `/Community` 
+    }, true); 
+  }
+}
+
 
 export async function createPost(
   content: string, 
@@ -87,6 +128,10 @@ export async function createPost(
   }
 
   revalidatePath("/Community", "layout");
+  
+  // Parse and notify mentions asynchronously
+  parseAndNotifyMentions(content, user.id, false).catch(err => console.error("Mention parsing error:", err));
+
   return { success: true, post };
 }
 
@@ -204,6 +249,10 @@ export async function addComment(postId: string, content: string, parentCommentI
   }
 
   revalidatePath("/Community", "layout");
+  
+  // Parse and notify mentions asynchronously
+  parseAndNotifyMentions(content, user.id, true).catch(err => console.error("Mention parsing error:", err));
+  
   return { success: true, comment };
 }
 

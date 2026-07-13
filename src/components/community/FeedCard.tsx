@@ -136,6 +136,29 @@ export function FeedCard({
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
+  const renderContentWithMentions = (text: string) => {
+    if (!text) return null;
+    const parts = text.split(/(@[a-zA-Z0-9_]+)/g);
+    return parts.map((part, i) => {
+      if (part.match(/^@[a-zA-Z0-9_]+$/)) {
+        return (
+          <span 
+            key={i} 
+            className="text-[#e71014] font-bold hover:underline cursor-pointer relative z-20" 
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              router.push(`/u/${part.substring(1)}`);
+            }}
+          >
+            {part}
+          </span>
+        );
+      }
+      return <React.Fragment key={i}>{part}</React.Fragment>;
+    });
+  };
+
   const slugify = (text: string) => {
     return text
       .toString()
@@ -359,7 +382,7 @@ export function FeedCard({
               <div className="bg-black/40 backdrop-blur-sm border border-white/5 rounded-2xl p-5 md:p-6 shadow-inner">
                 {currentContent ? (
                   <p className="text-[#ccc] text-sm md:text-base leading-relaxed whitespace-pre-wrap break-words">
-                    {currentContent}
+                    {renderContentWithMentions(currentContent)}
                   </p>
                 ) : (
                   <p className="text-white/20 italic text-sm">No description provided for this vault.</p>
@@ -435,7 +458,7 @@ export function FeedCard({
               {previewComments.map((comment) => (
                 <div key={comment.id} className="flex gap-2.5 text-xs bg-black/40 p-2.5 rounded-xl border border-white/5">
                   <span className="font-bold text-white/90 shrink-0">{comment.user.username}:</span>
-                  <span className="text-[#bbb] truncate">{comment.content}</span>
+                  <span className="text-[#bbb] truncate">{renderContentWithMentions(comment.content)}</span>
                 </div>
               ))}
             </div>
@@ -660,7 +683,7 @@ export function FeedCard({
                     )}
                     {currentContent && (
                       <p className="text-on-surface text-[15px] leading-snug whitespace-pre-wrap break-words">
-                        {currentContent}
+                        {renderContentWithMentions(currentContent)}
                       </p>
                     )}
                     {isSpoilerVault && !isDetailView && (
