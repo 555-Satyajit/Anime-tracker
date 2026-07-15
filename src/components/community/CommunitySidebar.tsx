@@ -12,6 +12,18 @@ export function TrendingTopics({ posts = [] }: { posts?: any[] }) {
     return "bg-white/10 text-[#888]";
   };
 
+  const slugify = (text: string) => {
+    return text
+      .toString()
+      .toLowerCase()
+      .replace(/\s+/g, "_")
+      .replace(/[^\w\-]+/g, "")
+      .replace(/\-\-+/g, "_")
+      .replace(/^-+/, "")
+      .replace(/-+$/, "")
+      .slice(0, 50);
+  };
+
   if (posts.length === 0) return null;
 
   return (
@@ -24,7 +36,7 @@ export function TrendingTopics({ posts = [] }: { posts?: any[] }) {
       </div>
       <div className="flex flex-col gap-4">
         {posts.map((post, index) => (
-          <Link key={post.id} href={`/Community/post/${post.id}`}>
+          <Link key={post.id} href={`/Community/comments/${post.id}/${slugify(post.title || post.content || "discussion")}`}>
             <div className="flex items-center gap-3 cursor-pointer group">
               <div className={cn("w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold shrink-0", getRankColor(index + 1))}>
                 {index + 1}

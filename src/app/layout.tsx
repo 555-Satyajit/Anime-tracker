@@ -56,7 +56,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground overflow-x-hidden pb-20 lg:pb-0">
-        <NextTopLoader 
+        <NextTopLoader
           color="#e71014"
           initialPosition={0.08}
           crawlSpeed={200}

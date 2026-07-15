@@ -66,8 +66,69 @@ export default async function AnimePage({ params }: { params: Promise<{ id: stri
     .map((edge: any) => edge.node.name.full);
   const directorList = directors && directors.length > 0 ? directors.join(", ") : null;
 
+  // JSON-LD AEO/GEO Schema Generation
+  const isMovie = anime.format === 'MOVIE';
+  const schemaType = isMovie ? 'Movie' : 'TVSeries';
+  
+  const mainSchema = {
+    '@context': 'https://schema.org',
+    '@type': schemaType,
+    name: title,
+    alternativeHeadline: anime.title.native,
+    image: anime.coverImage?.extraLarge || anime.coverImage?.large,
+    description: anime.description?.replace(/<[^>]*>?/gm, ''),
+    director: directors ? directors.map((d: string) => ({ '@type': 'Person', name: d })) : undefined,
+    productionCompany: anime.studios?.nodes?.map((s: any) => ({ '@type': 'Organization', name: s.name })),
+    numberOfEpisodes: anime.episodes,
+    startDate: anime.seasonYear ? `${anime.seasonYear}` : undefined,
+    genre: anime.genres,
+  };
+
+  const faqSchema: any = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: `How many episodes are in ${title}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: anime.episodes ? `${title} has ${anime.episodes} episodes.` : `The episode count for ${title} is currently unknown.`
+        }
+      },
+      {
+        '@type': 'Question',
+        name: `What is the current status of ${title}?`,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: `${title} is currently ${anime.status || 'unknown'}.`
+        }
+      }
+    ]
+  };
+
+  if (anime.nextAiringEpisode) {
+    const nextEpDate = new Date(Date.now() + anime.nextAiringEpisode.timeUntilAiring * 1000).toDateString();
+    faqSchema.mainEntity.push({
+      '@type': 'Question',
+      name: `When does episode ${anime.nextAiringEpisode.episode} of ${title} come out?`,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: `Episode ${anime.nextAiringEpisode.episode} of ${title} is scheduled to air around ${nextEpDate}.`
+      }
+    });
+  }
+
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-foreground flex flex-col pb-20 md:pb-0 font-sans">
+    <article className="min-h-screen bg-[#0a0a0a] text-foreground flex flex-col pb-20 md:pb-0 font-sans">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(mainSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <Navbar />
 
       <main className="flex-1 w-full pt-0">
@@ -124,7 +185,9 @@ export default async function AnimePage({ params }: { params: Promise<{ id: stri
                 </div>
 
                 <h1 className="text-3xl md:text-5xl lg:text-6xl font-black leading-tight mb-1 md:mb-2 text-white drop-shadow-xl tracking-tight">
+                  <span className="sr-only">Watch and Track </span>
                   {title}
+                  <span className="sr-only"> on SenkaiHub</span>
                 </h1>
                 
                 {anime.title.native && anime.title.native !== title && (
@@ -381,7 +444,7 @@ export default async function AnimePage({ params }: { params: Promise<{ id: stri
       </main>
 
       <Footer />
-    </div>
+    </article>
   );
 }
 
